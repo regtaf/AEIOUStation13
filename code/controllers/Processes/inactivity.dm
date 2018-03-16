@@ -33,4 +33,7 @@
 					log_and_message_admins("being kicked for AFK[information][adminlinks]", C.mob)
 
 					qdel(C)
+			else if(C.is_afk((config.kick_inactive MINUTES) - 5 MINUTES)) //VOREStation Edit. 25 minutes should be good.
+				to_chat(C,"<span class='warning'>You are about to be kicked from the server due to inactivity.</span>") //VOREStation Edit
 			SCHECK
+
