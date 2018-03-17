@@ -106,10 +106,8 @@
 			visible_message("<span class='danger'><p><font size=4>The dormant husk of [src] bursts open, revealing a new, intact copy in the pool of viscera.</font></p></span>") //Bloody hell...
 
 /mob/living/carbon/human/proc/chimera_hatch()
-	last_special = world.time + 1 HOUR
 	verbs -= /mob/living/carbon/human/proc/hatch
 	to_chat(src, "<span class='notice'>Your new body awakens, bursting free from your old skin.</span>")
-	reviving = FALSE
 
 	//Modify and record values (half nutrition and braindamage)
 	var/old_nutrition = nutrition * 0.5
@@ -133,6 +131,8 @@
 	//Visual effects
 	var/T = get_turf(src)
 	new /obj/effect/gibspawner/human/scree(T)
+
+	schedule_callback_in(1 HOUR, VARSET_CALLBACK(src, reviving, FALSE))
 
 /obj/effect/gibspawner/human/scree
 	fleshcolor = "#14AD8B" //Scree blood.
