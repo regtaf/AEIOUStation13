@@ -728,10 +728,12 @@ Note that amputating the affected organ does in fact remove the infection from t
 		heal_amt = round(heal_amt,0.1)
 		W.heal_damage(heal_amt)
 
-		// Salving also helps against infection
-		if(W.germ_level > 0 && W.salved && prob(2))
-			W.disinfected = 1
-			W.germ_level = 0
+		// VOREStation Edit - No, this randomness makes for annoying gameplay
+		// // Salving also helps against infection
+		// if(W.germ_level > 0 && W.salved && prob(2))
+		// 	W.disinfected = 1
+		// 	W.germ_level = 0
+		// VOREStation Edit End
 
 	// sync the organ's damage with its wounds
 	src.update_damages()

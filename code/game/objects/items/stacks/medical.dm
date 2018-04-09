@@ -241,23 +241,63 @@
 		if(affecting.open)
 			to_chat(user, "<span class='notice'>The [affecting.name] is cut open, you'll need more than a bandage!</span>")
 
-		if(affecting.is_salved())
-			to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been salved.</span>")
+		if(affecting.is_salved() && affecting.is_disinfected())
+			to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been treated.</span>")
 			return 1
 		else
-			user.visible_message("<span class='notice'>\The [user] starts salving wounds on [M]'s [affecting.name].</span>", \
-					             "<span class='notice'>You start salving the wounds on [M]'s [affecting.name].</span>" )
+			user.visible_message("<span class='notice'>\The [user] starts treating wounds on [M]'s [affecting.name].</span>", \
+					             "<span class='notice'>You start treating the wounds on [M]'s [affecting.name].</span>" )
 			if(!do_mob(user, M, 10))
 				to_chat(user, "<span class='notice'>You must stand still to salve wounds.</span>")
 				return 1
-			if(affecting.is_salved()) // We do a second check after the delay, in case it was bandaged after the first check.
-				to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been salved.</span>")
+			if(affecting.is_salved() && affecting.is_disinfected()) // We do a second check after the delay, in case it was bandaged after the first check.
+				to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been treated.</span>")
 				return 1
 			user.visible_message( 	"<span class='notice'>[user] covers wounds on [M]'s [affecting.name] with regenerative membrane.</span>", \
 									"<span class='notice'>You cover wounds on [M]'s [affecting.name] with regenerative membrane.</span>" )
 			affecting.heal_damage(0,heal_burn)
 			use(1)
 			affecting.salve()
+			affecting.disinfect()
+
+
+/obj/item/stack/medical/disinfectant
+	name = "sanitizing wipes"
+	desc = "Used to purge those evil microbes from wounds."
+	gender = PLURAL
+	singular_name = "sanitizing wipes"
+	icon_state = "gauze"
+	origin_tech = list(TECH_BIO = 1)
+	no_variants = FALSE
+
+/obj/item/stack/medical/disinfectant/attack(mob/living/carbon/M as mob, mob/user as mob)
+	if(..())
+		return 1
+
+	if (ishuman(M))
+		var/mob/living/carbon/human/H = M
+		var/obj/item/organ/external/affecting = H.get_organ(user.zone_sel.selecting)
+
+		if(affecting.open)
+			to_chat(user, "<span class='notice'>The [affecting.name] is cut open, you'll need more than a wipe!</span>")
+		if(affecting.is_disinfected())
+			to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been treated.</span>")
+			return 1
+
+		user.visible_message("<span class='notice'>\The [user] starts disinfecting wounds on [M]'s [affecting.name].</span>", \
+				             "<span class='notice'>You start disinfecting the wounds on [M]'s [affecting.name].</span>" )
+		if(!do_mob(user, M, 10))
+			to_chat(user, "<span class='notice'>You must stand still to salve wounds.</span>")
+			return 1
+		if(affecting.is_salved() && affecting.is_disinfected()) // We do a second check after the delay, in case it was bandaged after the first check.
+			to_chat(user, "<span class='warning'>The wounds on [M]'s [affecting.name] have already been treated.</span>")
+			return 1
+		user.visible_message( 	"<span class='notice'>[user] covers wounds on [M]'s [affecting.name] with regenerative membrane.</span>", \
+								"<span class='notice'>You cover wounds on [M]'s [affecting.name] with regenerative membrane.</span>" )
+		affecting.heal_damage(0,heal_burn)
+		use(1)
+		affecting.salve()
+
 
 /obj/item/stack/medical/splint
 	name = "medical splints"

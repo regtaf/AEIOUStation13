@@ -124,11 +124,14 @@
 	proc/infection_check()
 		if (damage < 10)	//small cuts, tiny bruises, and moderate burns shouldn't be infectable.
 			return 0
-		if (is_treated() && damage < 25)	//anything less than a flesh wound (or equivalent) isn't infectable if treated properly
+		//anything less than a flesh wound (or equivalent) isn't infectable if treated properly
+		if (is_treated() && (damage < 25 || disinfected)) // VOREStation Edit - A treated and disinfected wound tho, won't get re-infected.
 			return 0
-		if (disinfected)
-			germ_level = 0	//reset this, just in case
-			return 0
+		// VOREStation Edit - Having been disinfected does not change wether we can *become* infected
+		// if (disinfected)
+		// 	germ_level = 0	//reset this, just in case
+		// 	return 0
+		// VOREStation Edit End
 
 		if (damage_type == BRUISE && !bleeding()) //bruises only infectable if bleeding
 			return 0
