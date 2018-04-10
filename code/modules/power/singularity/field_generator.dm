@@ -202,12 +202,12 @@ field_generator power level display
 
 	var/power_draw = gen_power_draw
 	for(var/obj/machinery/field_generator/FG in connected_gens)
-		if (!isnull(FG))
+		if (!QDELETED(FG))
 			power_draw += gen_power_draw
 	for (var/obj/machinery/containment_field/F in fields)
-		if (!isnull(F))
+		if (!QDELETED(F))
 			power_draw += field_power_draw
-	power_draw /= 2	//because this will be mirrored for both generators
+	power_draw *= 0.5	//because this will be mirrored for both generators
 	if(draw_power(round(power_draw)) >= power_draw)
 		return 1
 	else
@@ -245,13 +245,13 @@ field_generator power level display
 		turn_off()
 		return
 	spawn(1)
-		setup_field(1)
+		setup_field(NORTH)
 	spawn(2)
-		setup_field(2)
+		setup_field(SOUTH)
 	spawn(3)
-		setup_field(4)
+		setup_field(EAST)
 	spawn(4)
-		setup_field(8)
+		setup_field(WEST)
 	src.active = 2
 
 
@@ -291,25 +291,9 @@ field_generator power level display
 			G.fields += CF
 			CF.loc = T
 			CF.set_dir(field_dir)
-	var/listcheck = 0
-	for(var/obj/machinery/field_generator/FG in connected_gens)
-		if (isnull(FG))
-			continue
-		if(FG == G)
-			listcheck = 1
-			break
-	if(!listcheck)
-		connected_gens.Add(G)
-	listcheck = 0
-	for(var/obj/machinery/field_generator/FG2 in G.connected_gens)
-		if (isnull(FG2))
-			continue
-		if(FG2 == src)
-			listcheck = 1
-			break
-	if(!listcheck)
-		G.connected_gens.Add(src)
-
+	// Link us up!, being careful not to double-link
+	src.connected_gens |= G
+	G.connected_gens |= src
 
 /obj/machinery/field_generator/proc/cleanup()
 	clean_up = 1
