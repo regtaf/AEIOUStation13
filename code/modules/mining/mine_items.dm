@@ -30,11 +30,6 @@
 
 	var/excavation_amount = 200
 
-/obj/item/weapon/pickaxe/hammer
-	name = "sledgehammer"
-	//icon_state = "sledgehammer" Waiting on sprite
-	desc = "A mining hammer made of reinforced metal. You feel like smashing your boss in the face with this."
-
 /obj/item/weapon/pickaxe/silver
 	name = "silver pickaxe"
 	icon_state = "spickaxe"
@@ -128,6 +123,7 @@
 	attack_verb = list("bashed", "bludgeoned", "thrashed", "whacked")
 	sharp = 0
 	edge = 1
+	var/edged = 0 //AEiou ADDITION
 
 /obj/item/weapon/shovel/spade
 	name = "spade"
@@ -137,6 +133,16 @@
 	force = 5.0
 	throwforce = 7.0
 	w_class = ITEMSIZE_SMALL
+
+
+/obj/item/weapon/shovel/attackby(obj/item/weapon/W, mob/user as mob) //aeiou addition
+	if(istype(W, /obj/item/weapon/whetstone))
+		if(!edged)
+			force = force * 1.5
+			user.visible_message("[user] has sharpened \the [src]", "You finish sharpening \the [src].")
+			edged = 1
+		else
+			to_chat(user, "<span class='notice'>[src] can't be sharpened further.</span>")
 
 
 /**********************Mining car (Crate like thing, not the rail car)**************************/

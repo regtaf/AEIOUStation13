@@ -14,6 +14,7 @@
 #define GODMODE     0x1000
 #define FAKEDEATH   0x2000  // Replaces stuff like changeling.changeling_fakedeath.
 #define DISFIGURED  0x4000  // Set but never checked. Remove this sometime and replace occurences with the appropriate organ code
+#define XENO_HOST   0x8000  //this is a test. Hopefully it works.
 
 // Grab levels.
 #define GRAB_PASSIVE    1
@@ -101,6 +102,7 @@
 #define INV_ACCESSORIES_DEF_ICON 'icons/mob/ties.dmi'
 #define INV_TIE_DEF_ICON 'icons/mob/ties.dmi'
 #define INV_SUIT_DEF_ICON 'icons/mob/suit.dmi'
+#define INV_SPACESUIT_DEF_ICON 'icons/mob/spacesuit.dmi'
 #define INV_WEAR_ID_DEF_ICON 'icons/mob/mob.dmi'
 #define INV_GLOVES_DEF_ICON 'icons/mob/hands.dmi'
 #define INV_EYES_DEF_ICON 'icons/mob/eyes.dmi'
@@ -167,15 +169,19 @@
 #define MODIFIER_GENETIC	1	// Modifiers with this flag will be copied to mobs who get cloned.
 
 // Bodyparts and organs.
-#define O_MOUTH    "mouth"
 #define O_EYES     "eyes"
 #define O_HEART    "heart"
-#define O_CELL     "cell"
 #define O_LUNGS    "lungs"
 #define O_BRAIN    "brain"
 #define O_LIVER    "liver"
 #define O_KIDNEYS  "kidneys"
 #define O_APPENDIX "appendix"
+#define O_VOICE    "voicebox"
+#define O_STANDARD list(O_EYES, O_HEART, O_LUNGS, O_BRAIN, O_LIVER, O_KIDNEYS, O_APPENDIX, O_VOICE)
+
+// Non-Standard organs
+#define O_MOUTH    "mouth"
+#define O_CELL     "cell"
 #define O_PLASMA   "plasma vessel"
 #define O_HIVE     "hive node"
 #define O_NUTRIENT "nutrient vessel"
@@ -187,7 +193,9 @@
 #define O_ACID     "acid gland"
 #define O_EGG      "egg sac"
 #define O_RESIN    "resin spinner"
+#define O_ALL list(O_STANDARD, O_MOUTH, O_CELL, O_PLASMA, O_HIVE, O_NUTRIENT, O_STRATA, O_RESPONSE, O_GBLADDER, O_POLYP, O_ANCHOR, O_ACID, O_EGG, O_RESIN)
 
+// External organs, aka limbs
 #define BP_L_FOOT "l_foot"
 #define BP_R_FOOT "r_foot"
 #define BP_L_LEG  "l_leg"
@@ -264,6 +272,7 @@
 #define SPECIES_SHADOW			"Shadow"
 #define SPECIES_SKELETON		"Skeleton"
 #define SPECIES_GOLEM			"Golem"
+#define SPECIES_EVENT1			"X Occursus"
 
 // Used to seperate simple animals by ""intelligence"".
 #define SA_PLANT	1
@@ -293,16 +302,42 @@
 #define VIS_CH_SPECIAL		13
 #define VIS_CH_STATUS_OOC	14
 
-#define VIS_D_COLORBLIND	15
-#define VIS_D_COLORBLINDI	16
+#define VIS_ADMIN1			15
+#define VIS_ADMIN2			16
+#define VIS_ADMIN3			17
 
-#define VIS_ADMIN1			17
-#define VIS_ADMIN2			18
-#define VIS_ADMIN3			19
+#define VIS_MESONS			18
 
-#define VIS_MESONS			20
+#define VIS_TURFS			19
+#define VIS_OBJS			20
+#define VIS_MOBS			21
 
-#define VIS_COUNT			20 //Must be highest number from above.
+#define VIS_COUNT			21 //Must be highest number from above.
 
 //Some mob icon layering defines
 #define BODY_LAYER		-100
+
+// Clothing flags, organized in roughly top-bottom
+#define EXAMINE_SKIPHELMET			0x0001
+#define EXAMINE_SKIPEARS			0x0002
+#define EXAMINE_SKIPEYEWEAR			0x0004
+#define EXAMINE_SKIPMASK			0x0008
+#define EXAMINE_SKIPJUMPSUIT		0x0010
+#define EXAMINE_SKIPTIE				0x0020
+#define EXAMINE_SKIPHOLSTER			0x0040
+#define EXAMINE_SKIPSUITSTORAGE		0x0080
+#define EXAMINE_SKIPBACKPACK		0x0100
+#define EXAMINE_SKIPGLOVES			0x0200
+#define EXAMINE_SKIPBELT			0x0400
+#define EXAMINE_SKIPSHOES			0x0800
+
+// Body flags
+#define EXAMINE_SKIPHEAD			0x0001
+#define EXAMINE_SKIPEYES			0x0002
+#define EXAMINE_SKIPFACE			0x0004
+#define EXAMINE_SKIPBODY			0x0008
+#define EXAMINE_SKIPGROIN			0x0010
+#define EXAMINE_SKIPARMS			0x0020
+#define EXAMINE_SKIPHANDS			0x0040
+#define EXAMINE_SKIPLEGS			0x0080
+#define EXAMINE_SKIPFEET			0x0100

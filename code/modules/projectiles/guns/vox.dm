@@ -9,8 +9,8 @@
 
 	var/last_regen = 0
 	var/spike_gen_time = 150
-	var/max_spikes = 3
-	var/spikes = 3
+	var/max_spikes = 5
+	var/spikes = 5
 	release_force = 30
 	icon = 'icons/obj/gun.dmi'
 	icon_state = "spikethrower3"
@@ -35,7 +35,7 @@
 
 /obj/item/weapon/gun/launcher/spikethrower/examine(mob/user)
 	..(user)
-	user << "It has [spikes] spike\s remaining."
+	to_chat(user, "It has [spikes] spike\s remaining.")
 
 /obj/item/weapon/gun/launcher/spikethrower/update_icon()
 	icon_state = "spikethrower[spikes]"
@@ -47,6 +47,20 @@
 	if(spikes < 1) return null
 	spikes--
 	return new /obj/item/weapon/spike(src)
+
+/obj/item/weapon/gun/launcher/spikethrower/pistol//same but smaller
+	name = "spike thrower"
+	desc = "A vicious alien projectile weapon. Parts of it quiver gelatinously, as though the thing is insectile and alive. It fits in one hand."
+	max_spikes = 2
+	w_class = ITEMSIZE_NORMAL
+	spikes = 2
+	release_force = 20
+	icon = 'modular_aeiou/icons/obj/gun_aeiou.dmi'
+	icon_state = "dart_thrower2"
+	item_state = "dart_thrower"
+	fire_sound_text = "a strange noise"
+	fire_sound = 'sound/weapons/bladeslice.ogg'
+
 
 /*
  * Vox Darkmatter Cannon
@@ -65,7 +79,7 @@
 
 	firemodes = list(
 		list(mode_name="stunning", burst=1, fire_delay=null, move_delay=null, burst_accuracy=list(30), dispersion=null, projectile_type=/obj/item/projectile/beam/stun/darkmatter, charge_cost = 300),
-		list(mode_name="focused", burst=1, fire_delay=null, move_delay=null, burst_accuracy=list(30), dispersion=null, projectile_type=/obj/item/projectile/beam/darkmatter, charge_cost = 600),
+		list(mode_name="focused", burst=1, fire_delay=null, move_delay=null, burst_accuracy=list(30), dispersion=null, projectile_type=/obj/item/projectile/beam/darkmatter, charge_cost = 400),
 		list(mode_name="scatter burst", burst=8, fire_delay=null, move_delay=4, burst_accuracy=list(0, 0, 0, 0, 0, 0, 0, 0), dispersion=list(3, 3, 3, 3, 3, 3, 3, 3, 3), projectile_type=/obj/item/projectile/energy/darkmatter, charge_cost = 300),
 		)
 
@@ -112,7 +126,7 @@
 	embed_chance = 0
 
 /*
- * Vox Darkmatter Cannon
+ * Vox Sonic Cannon
  */
 /obj/item/weapon/gun/energy/sonic
 	name = "soundcannon"
@@ -122,7 +136,7 @@
 	w_class = ITEMSIZE_HUGE
 	cell_type = /obj/item/weapon/cell/device/weapon/recharge
 	battery_lock = 1
-	charge_cost = 600
+	charge_cost = 400
 
 	projectile_type=/obj/item/projectile/sonic/weak
 
@@ -153,3 +167,4 @@
 		var/throwdir = get_dir(firer,target)
 		target.throw_at(get_edge_target_turf(target, throwdir), rand(1,6), 10)
 		return 1
+

@@ -6,6 +6,7 @@
 	step_in = 3
 	dir_in = 1 //Facing North.
 	health = 300
+	maxhealth = 300
 	deflect_chance = 15
 	damage_absorption = list("brute"=0.75,"fire"=1,"bullet"=0.8,"laser"=0.7,"energy"=0.85,"bomb"=1)
 	max_temperature = 25000
@@ -16,12 +17,19 @@
 	internal_damage_threshold = 35
 	max_equip = 3
 
+	max_hull_equip = 1
+	max_weapon_equip = 2
+	max_utility_equip = 2
+	max_universal_equip = 1
+	max_special_equip = 1
+
 /obj/mecha/combat/gygax/dark
 	desc = "A lightweight exosuit used by Heavy Asset Protection. A significantly upgraded Gygax security mech."
 	name = "Dark Gygax"
 	icon_state = "darkgygax"
 	initial_icon = "darkgygax"
 	health = 400
+	maxhealth = 400
 	deflect_chance = 25
 	damage_absorption = list("brute"=0.6,"fire"=0.8,"bullet"=0.6,"laser"=0.5,"energy"=0.65,"bomb"=0.8)
 	max_temperature = 45000
@@ -30,11 +38,17 @@
 	max_equip = 4
 	step_energy_drain = 5
 
+	max_hull_equip = 1
+	max_weapon_equip = 2
+	max_utility_equip = 2
+	max_universal_equip = 1
+	max_special_equip = 2
+
 /obj/mecha/combat/gygax/dark/New()
 	..()
 	var/obj/item/mecha_parts/mecha_equipment/ME = new /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/scattershot
 	ME.attach(src)
-	ME = new /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/missile_rack/flashbang/clusterbang
+	ME = new /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/missile_rack/grenade/clusterbang
 	ME.attach(src)
 	ME = new /obj/item/mecha_parts/mecha_equipment/teleporter
 	ME.attach(src)
@@ -57,6 +71,10 @@
 	set name = "Toggle leg actuators overload"
 	set src = usr.loc
 	set popup_menu = 0
+	leg_overload()
+
+
+/obj/mecha/combat/gygax/leg_overload()
 	if(usr!=src.occupant)
 		return
 	if(overload)
@@ -64,12 +82,15 @@
 		step_in = initial(step_in)
 		step_energy_drain = initial(step_energy_drain)
 		src.occupant_message("<font color='blue'>You disable leg actuators overload.</font>")
+		leg_overload_mode = 0
 	else
 		overload = 1
 		step_in = min(1, round(step_in/2))
 		step_energy_drain = step_energy_drain*overload_coeff
 		src.occupant_message("<font color='red'>You enable leg actuators overload.</font>")
+		leg_overload_mode = 1
 	src.log_message("Toggled leg actuators overload.")
+	playsound(src, 'sound/mecha/mechanical_toggle.ogg', 50, 1)
 	return
 
 /obj/mecha/combat/gygax/dyndomove(direction)
@@ -105,3 +126,13 @@
 	if (href_list["toggle_leg_overload"])
 		src.overload()
 	return
+
+
+
+/obj/mecha/combat/gygax/GrantActions(mob/living/user, human_occupant = 0)
+	..()
+	overload_action.Grant(user, src)
+
+/obj/mecha/combat/gygax/RemoveActions(mob/living/user, human_occupant = 0)
+	..()
+	overload_action.Remove(user, src)

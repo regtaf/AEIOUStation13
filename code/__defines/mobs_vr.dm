@@ -1,17 +1,20 @@
 #undef VIS_COUNT
 
-#define VIS_CH_STATUS_R		21
-#define VIS_CH_HEALTH_VR	22
-#define VIS_CH_BACKUP		23
-#define VIS_CH_VANTAG		24
+#define VIS_CH_STATUS_R		22
+#define VIS_CH_HEALTH_VR	23
+#define VIS_CH_BACKUP		24
+#define VIS_CH_VANTAG		25
 
-#define VIS_AUGMENTED		25
+#define VIS_AUGMENTED		26
 
-#define VIS_COUNT			25
+#define VIS_COUNT			26
 
 //Protean organs
 #define O_ORCH		"orchestrator"
 #define O_FACT		"refactory"
+
+//Alraune organs
+#define A_FRUIT	"fruit gland"
 
 //species defines
 #define SPECIES_AKULA			"Akula"

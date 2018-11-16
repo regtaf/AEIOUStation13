@@ -96,8 +96,8 @@
 
 /datum/trait/winged_flight
 	name = "Winged Flight"
-	desc = "Allows you to fly by using your wings."
-	cost = 2 //Some in game value.
+	desc = "Allows you to fly by using your wings. Don't forget to bring them!"
+	cost = 1
 
 /datum/trait/winged_flight/apply(var/datum/species/S,var/mob/living/carbon/human/H)
 	..(S,H)
@@ -109,3 +109,18 @@
 	desc = "Makes your nice clawed, scaled, hooved, armored, or otherwise just awfully calloused feet immune to glass shards."
 	cost = 1
 	var_changes = list("flags" = NO_MINOR_CUT) //Checked the flag is only used by shard stepping.
+
+/*//Currently doesn't work because nestor dgaf. Also apparently updage changed.
+/datum/trait/fit
+	name = "Fit"
+	desc = "Your natural fitness and/or your physical training give you an advantage in close quarters combat."
+	cost = 2
+	var_changes = list(outgoing_melee_damage_percent = 1.2)
+
+/datum/trait/strong
+	name = "Strong"
+	desc = "Your extremely high physical strength vastly impoves your capabilities in close quarters combat."
+	cost = 3
+	var_changes = list(outgoing_melee_damage_percent = 1.4)
+*/
+

@@ -8,7 +8,7 @@
 	pockets.max_storage_space = ITEMSIZE_COST_SMALL * 2
 
 /obj/item/clothing/suit/storage/Destroy()
-	qdel_null(pockets)
+	QDEL_NULL(pockets)
 	return ..()
 
 /obj/item/clothing/suit/storage/attack_hand(mob/user as mob)
@@ -53,6 +53,8 @@
 			return
 		update_clothing_icon()	//so our overlays update
 
+/obj/item/clothing/suit/storage/toggle/AltClick(var/mob/user)
+	toggle()
 
 /obj/item/clothing/suit/storage/hooded/toggle
 	flags_inv = HIDEHOLSTER

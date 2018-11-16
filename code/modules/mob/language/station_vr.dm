@@ -71,6 +71,39 @@
 	"mihi","wan","six","salve","tartu")
 	machine_understands = FALSE
 
+/*/datum/language/tajsign
+	name = LANGUAGE_SIIK_TAJR
+	desc = "A type of sign language mostly based on tail movements that was used during the Tajaran rebellion."
+	signlang_verb = list("uses their tail to convey", "gestures with their tail", "gestures with their tail elaborately")
+	colour = "tajaran"
+	key = "l"
+	flags = WHITELISTED | SIGNLANG | NO_STUTTER | NONVERBAL
+*/
+/datum/language/lanius
+	name = LANGUAGE_LANIUS
+	desc = "The ear-piercing language, consisting of high-pitched screeches and metal clunking."
+	speech_verb = "creaks"
+	ask_verb = "squeaks"
+	exclaim_verb = "screeches"
+	colour = "scraptalk" //So fancy
+	key = "ln"
+	syllables = list("krr","clunk","tonk","kree","chee","eee","schee","bonk","shh","kree","creak","squeak",
+	"kee","zas","saz","rra","kaha")
+	flags = WHITELISTED
+	machine_understands = FALSE
+
+/*
+/datum/language/bonezone
+	name = LANGUAGE_BONERS
+	desc = "Rattle me bones!"
+	speech_verb = "rattles"
+	ask_verb = "rattles inquisitively"
+	exclaim_verb = "rattles loudly"
+	colour = "bonerattle" //RATTLE ME BONES
+	key = "bz"
+	syllables = list("rattle")*/
+
+
 
 /datum/language/unathi
 	flags = 0

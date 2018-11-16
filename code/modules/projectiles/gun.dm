@@ -71,9 +71,11 @@
 
 	var/wielded_item_state
 	var/one_handed_penalty = 0 // Penalty applied if someone fires a two-handed gun with one hand.
+	var/recoil_m = 1 //Causes some things to happen depending on the size of the character using it. If set to 2, any size can use it with no penalty. If set to 1, macros might fail to fire the weapon and micros might drop the gun or get knocked over. 0 does something similar to 1, but for energy weapons and causes burns instead of brute on micros.
 	var/obj/screen/auto_target/auto_target
 	var/shooting = 0
 	var/next_fire_time = 0
+	var/unfolded_stock = 0
 
 	var/sel_mode = 1 //index of the currently selected mode
 	var/list/firemodes = list()
@@ -97,29 +99,72 @@
 	var/shaded_charge = FALSE
 	var/ammo_x_offset = 2
 	var/ammo_y_offset = 0
-	var/can_flashlight = FALSE
-	var/gun_light = FALSE
-	var/light_state = "flight"
-	var/light_brightness = 4
-	var/flight_x_offset = 0
-	var/flight_y_offset = 0
+	var/can_flashlight = 0 //This means "Can we add a light to this"
+	var/obj/item/device/flashlight/flght = null //The actual light attachement.
+	var/gun_light = 0 //is the light on(?)
+	var/light_state = "flght"
+	var/light_brightness = 4 //The bright shine
+	var/flight_x_offset = 0 //Variables for the overlay
+	var/flight_y_offset = 0 //Same.
 
-/obj/item/weapon/gun/CtrlClick(mob/user)
+//AEIOU Adds
+	var/sound_override = 0 //aeiou edit This allows to use custom noises instead of the bullet noise like most guns
+	var/silencer = 0 //I think it just makes the gun quieter
+
+//////////////////////////////////////
+/obj/item/weapon/gun/AltClick(mob/user)
 	if(can_flashlight && ishuman(user) && src.loc == usr && !user.incapacitated(INCAPACITATION_ALL))
 		toggle_flashlight()
 	else
 		return ..()
 
-/obj/item/weapon/gun/proc/toggle_flashlight()
+/obj/item/weapon/gun/proc/toggle_flashlight(mob/user)
+	if(!flght)
+		to_chat(user, "<span class='notice'>There is no light attached to [src].</span>")
+		return
+	to_chat(user, "<span class='notice'>You toggle the gunlight [flght.on ? "on":"off"].</span>")
 	if(gun_light)
 		set_light(0)
-		gun_light = FALSE
+		gun_light = !gun_light
 	else
 		set_light(light_brightness)
-		gun_light = TRUE
-
-	playsound(src, 'sound/machines/button.ogg', 25)
+		gun_light = !gun_light
+	flght.on = !flght.on
+	playsound(src, 'sound/machines/button.ogg', 35)
+//	set_light(light_brightness)
 	update_icon()
+
+///////////
+/*
+/obj/item/weapon/gun/AltClick(mob/user)
+	if(can_flashlight && ishuman(user) && src.loc == usr && !user.incapacitated(INCAPACITATION_ALL))
+		toggle_flashlight()
+	else
+		return ..()
+
+/obj/item/weapon/gun/verb/toggle_gunlight()
+		set name = "Adjust light"
+		set category = "Object"
+		set desc = "Click to toggle your weapon's attached flashlight."
+		set src in usr
+		turn_on_gunlight()
+
+/obj/item/weapon/gun/proc/turn_on_gunlight()
+	if(!Flight)
+		return
+	var/mob/living/carbon/human/user = usr
+	if(!isturf(user.loc))
+		user << "<span class='warning'>You cannot turn the light on while in this [user.loc]!</span>"
+	Flight.on = Flight.!on
+	user << "<span class='notice'>You toggle the gunlight [Flight.on ? "on":"off"].</span>"
+	set_light(light_brightness)
+	playsound(user, 'sound/weapons/empty.ogg', 70, 1)
+	update_icon()
+	return
+*/
+
+//AEIOU edition end
+////////////////////////////////////////////////////////////////
 //VOREStation Add End
 
 /obj/item/weapon/gun/New()
@@ -181,11 +226,11 @@
 	if(dna_lock && attached_lock.stored_dna)
 		if(!authorized_user(user))
 			if(attached_lock.safety_level == 0)
-				M << "<span class='danger'>\The [src] buzzes in dissapoint and displays an invalid DNA symbol.</span>"
+				to_chat(M, "<span class='danger'>\The [src] buzzes in dissapoint and displays an invalid DNA symbol.</span>")
 				return 0
 			if(!attached_lock.exploding)
 				if(attached_lock.safety_level == 1)
-					M << "<span class='danger'>\The [src] hisses in dissapointment.</span>"
+					to_chat(M, "<span class='danger'>\The [src] hisses in dissapointment.</span>")
 					visible_message("<span class='game say'><span class='name'>\The [src]</span> announces, \"Self-destruct occurring in ten seconds.\"</span>", "<span class='game say'><span class='name'>\The [src]</span> announces, \"Self-destruct occurring in ten seconds.\"</span>")
 					spawn(100)
 						explosion(src, 0, 0, 3, 4)
@@ -194,8 +239,30 @@
 						qdel(src)
 					return 0
 	if(HULK in M.mutations)
-		M << "<span class='danger'>Your fingers are much too large for the trigger guard!</span>"
+		to_chat(M, "<span class='danger'>Your fingers are much too large for the trigger guard!</span>")
 		return 0
+
+	if((M.size_multiplier >= 1.5) && prob(M.size_multiplier*30) && src.recoil_m != 2) //Macro handling
+		M << "<span class='danger'>Your large fingers struggle to get past the trigger guard!</span>"
+		return 0
+
+	if((M.size_multiplier <= 0.5) && prob(10/M.size_multiplier) && src.recoil_m == 1) //Micro handling projectile
+		M.adjustHalLoss(25)
+		M.adjustBruteLoss(15)
+		M.Move(get_step(M,rand(1,8)), rand(1,8))
+		M << "<span class='danger'>You get hurt and thrown by recoil!</span>"
+		return 1
+
+	if((M.size_multiplier <= 0.5) && prob(12/M.size_multiplier) && src.recoil_m == 0) //Micro handling energy
+		if (prob(50))
+			M.adjustHalLoss(20)
+			M.adjustFireLoss(12)
+			M << "<span class='danger'>The heat, radiating from the [src] is too intense! It burns [user]'s hand!</span>"
+		else
+			M << "<span class='danger'>The [src] vibrates too hard for [user] to handle and they drop it!</span>"
+			M.drop_item()
+		return 1
+
 	if((CLUMSY in M.mutations) && prob(40)) //Clumsy handling
 		var/obj/P = consume_next_projectile()
 		if(P)
@@ -227,11 +294,11 @@
 		return
 
 	if(user && user.a_intent == I_HELP && user.is_preference_enabled(/datum/client_preference/safefiring)) //regardless of what happens, refuse to shoot if help intent is on
-		user << "<span class='warning'>You refrain from firing your [src] as your intent is set to help.</span>"
+		to_chat(user, "<span class='warning'>You refrain from firing your [src] as your intent is set to help.</span>")
 		return
 
 	else
-		Fire(A, user, params) //Otherwise, fire normally.
+		Fire(A,user,params) //Otherwise, fire normally.
 		return
 
 /*	//Commented out for quality control and testing
@@ -267,9 +334,9 @@
 /obj/item/weapon/gun/attackby(var/obj/item/A as obj, mob/user as mob)
 	if(istype(A, /obj/item/dnalockingchip))
 		if(dna_lock)
-			user << "<span class='notice'>\The [src] already has a [attached_lock].</span>"
+			to_chat(user, "<span class='notice'>\The [src] already has a [attached_lock].</span>")
 			return
-		user << "<span class='notice'>You insert \the [A] into \the [src].</span>"
+		to_chat(user, "<span class='notice'>You insert \the [A] into \the [src].</span>")
 		user.drop_item()
 		A.loc = src
 		attached_lock = A
@@ -279,25 +346,48 @@
 		verbs += /obj/item/weapon/gun/verb/allow_dna
 		return
 
-	if(istype(A, /obj/item/weapon/screwdriver))
+	if(A.is_screwdriver())
 		if(dna_lock && attached_lock && !attached_lock.controller_lock)
-			user << "<span class='notice'>You begin removing \the [attached_lock] from \the [src].</span>"
+			to_chat(user, "<span class='notice'>You begin removing \the [attached_lock] from \the [src].</span>")
 			playsound(src, A.usesound, 50, 1)
+			update_icon()
 			if(do_after(user, 25 * A.toolspeed))
-				user << "<span class='notice'>You remove \the [attached_lock] from \the [src].</span>"
+				to_chat(user, "<span class='notice'>You remove \the [attached_lock] from \the [src].</span>")
 				user.put_in_hands(attached_lock)
 				dna_lock = 0
 				attached_lock = null
 				verbs -= /obj/item/weapon/gun/verb/remove_dna
 				verbs -= /obj/item/weapon/gun/verb/give_dna
 				verbs -= /obj/item/weapon/gun/verb/allow_dna
+
+	if(istype(A, /obj/item/device/flashlight/maglight))// AEIOU addition
+		var/obj/item/device/flashlight/maglight/S = A
+		if(can_flashlight)
+			if(!flght)
+				user.drop_item()
+				A.loc = src
+				flght = A
+				user << "<span class='notice'>You click [S] into place on [src].</span>"
+				update_icon()
 		else
-			user << "<span class='warning'>\The [src] is not accepting modifications at this time.</span>"
+			to_chat(user, "<span class='warning'>\The [src] is not accepting modifications at this time.</span>")
 	..()
+
+	if(istype(A, /obj/item/weapon/tool/screwdriver))// AEIOU addition
+		if(flght)
+			for(var/obj/item/device/flashlight/maglight/S in src)
+				user.put_in_hands(flght)
+				flght = null
+				user << "<span class='notice'>You unscrew the seclite from [src].</span>"
+				toggle_flashlight()
+				set_light(0)
+				update_icon()
+		else
+			user << "<span class='notice'>[src] has no light.</span>"
 
 /obj/item/weapon/gun/emag_act(var/remaining_charges, var/mob/user)
 	if(dna_lock && attached_lock.controller_lock)
-		user << "<span class='notice'>You short circuit the internal locking mechanisms of \the [src]!</span>"
+		to_chat(user, "<span class='notice'>You short circuit the internal locking mechanisms of \the [src]!</span>")
 		attached_lock.controller_dna = null
 		attached_lock.controller_lock = 0
 		attached_lock.stored_dna = list()
@@ -348,7 +438,7 @@
 
 	if(world.time < next_fire_time)
 		if (world.time % 3) //to prevent spam
-			user << "<span class='warning'>[src] is not ready to fire again!</span>"
+			to_chat(user, "<span class='warning'>[src] is not ready to fire again!</span>")
 		return
 
 	var/shoot_time = (burst - 1)* burst_delay
@@ -407,9 +497,11 @@
 
 		last_shot = world.time
 
-/*	// Commented out for quality control and testing.
+/*
+	// Commented out for quality control and testing.
 	shooting = 0
 */
+
 	// We do this down here, so we don't get the message if we fire an empty gun.
 	if(user.item_is_in_hands(src) && user.hands_are_full())
 		if(one_handed_penalty >= 20)
@@ -514,8 +606,6 @@
 	if(muzzle_flash)
 		set_light(0)
 
-
-
 //obtains the next projectile to fire
 /obj/item/weapon/gun/proc/consume_next_projectile()
 	return null
@@ -548,15 +638,15 @@
 				"<span class='reflex_shoot'>You fire \the [src] by reflex!</span>",
 				"You hear a [fire_sound_text]!"
 			)
-		else
-			user.visible_message(
+	else
+		user.visible_message(
 				"<span class='danger'>\The [user] fires \the [src][pointblank ? " point blank at \the [target]":""]!</span>",
 				"<span class='warning'>You fire \the [src]!</span>",
-				"You hear a [fire_sound_text]!"
-				)
+			"You hear a [fire_sound_text]!"
+		)
 
-	if(muzzle_flash)
-		set_light(muzzle_flash)
+		if(muzzle_flash)
+			set_light(muzzle_flash)
 
 	if(one_handed_penalty)
 		if(!src.is_held_twohanded(user))
@@ -586,7 +676,6 @@
 		spawn()
 			shake_camera(user, recoil+1, recoil)
 	update_icon()
-
 
 /obj/item/weapon/gun/proc/process_point_blank(obj/projectile, mob/user, atom/target)
 	var/obj/item/projectile/P = projectile
@@ -626,13 +715,7 @@
 	P.accuracy = accuracy + acc_mod
 	P.dispersion = disp_mod
 
-	// Certain statuses make it harder to aim, blindness especially.  Same chances as melee, however guns accuracy uses multiples of 15.
-	if(user.eye_blind)
-		P.accuracy -= 75
-	if(user.eye_blurry)
-		P.accuracy -= 30
-	if(user.confused)
-		P.accuracy -= 45
+	P.accuracy -= user.get_accuracy_penalty()
 
 	//accuracy bonus from aiming
 	if (aim_targets && (target in aim_targets))
@@ -676,13 +759,12 @@
 
 	return launched
 
-
 /obj/item/weapon/gun/proc/play_fire_sound(var/mob/user, var/obj/item/projectile/P)
-	var/shot_sound = (istype(P) && P.fire_sound)? P.fire_sound : fire_sound
-	if(silenced)
-		playsound(user, shot_sound, 10, 1)
-	else
-		playsound(user, shot_sound, 50, 1)
+    var/shot_sound = (istype(P) && P.fire_sound && !sound_override)? P.fire_sound : fire_sound
+    if(silenced)
+        playsound(user, shot_sound, 10, 1)
+    else
+        playsound(user, shot_sound, 50, 1)
 
 //Suicide handling.
 /obj/item/weapon/gun/var/mouthshoot = 0 //To stop people from suiciding twice... >.>
@@ -717,7 +799,7 @@
 			user.apply_damage(in_chamber.damage*2.5, in_chamber.damage_type, "head", used_weapon = "Point blank shot in the mouth with \a [in_chamber]", sharp=1)
 			user.death()
 		else
-			user << "<span class = 'notice'>Ow...</span>"
+			to_chat(user, "<span class = 'notice'>Ow...</span>")
 			user.apply_effect(110,AGONY,0)
 		qdel(in_chamber)
 		mouthshoot = 0
@@ -748,7 +830,7 @@
 		recoil = initial(recoil)
 
 /obj/item/weapon/gun/examine(mob/user)
-	..()
+	. = ..()
 	if(firemodes.len > 1)
 		var/datum/firemode/current_mode = firemodes[sel_mode]
 		to_chat(user, "The fire selector is set to [current_mode.name].")
@@ -763,6 +845,7 @@
 	var/datum/firemode/new_mode = firemodes[sel_mode]
 	new_mode.apply_to(src)
 	to_chat(user, "<span class='notice'>\The [src] is now set to [new_mode.name].</span>")
+	playsound(src.loc, 'sound/weapons/empty.ogg', 40, 1)
 
 	return new_mode
 

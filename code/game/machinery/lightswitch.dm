@@ -46,7 +46,7 @@
 
 /obj/machinery/light_switch/examine(mob/user)
 	if(..(user, 1))
-		user << "A light switch. It is [on? "on" : "off"]."
+		to_chat(user, "A light switch. It is [on? "on" : "off"].")
 
 /obj/machinery/light_switch/attack_hand(mob/user)
 
@@ -55,6 +55,7 @@
 	area.lightswitch = on
 	area.updateicon()
 	playsound(src, 'sound/machines/button.ogg', 100, 1, 0) // VOREStation Edit
+	lights_switched_on++
 
 	for(var/obj/machinery/light_switch/L in area)
 		L.on = on

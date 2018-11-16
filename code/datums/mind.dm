@@ -70,6 +70,9 @@
 
 	//used to store what traits the player had picked out in their preferences before joining, in text form.
 	var/list/traits = list()
+	
+	//AEIOU edit: Antag job restrictions
+	var/list/antag_job_restrictions = list()
 
 /datum/mind/New(var/key)
 	src.key = key
@@ -85,7 +88,7 @@
 			current.verbs -= /datum/changeling/proc/EvolutionMenu
 		current.mind = null
 
-		nanomanager.user_transferred(current, new_character) // transfer active NanoUI instances to new user
+		GLOB.nanomanager.user_transferred(current, new_character) // transfer active NanoUI instances to new user
 	if(new_character.mind)		//remove any mind currently in our new body's mind variable
 		new_character.mind.current = null
 

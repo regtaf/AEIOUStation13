@@ -77,6 +77,7 @@
 	name_language = LANGUAGE_SKRELLIAN
 	color_mult = 1
 	inherent_verbs = list(/mob/living/proc/shred_limb)
+	assisted_langs = list(LANGUAGE_EAL, LANGUAGE_TERMINUS, LANGUAGE_SKRELLIANFAR, LANGUAGE_ROOTLOCAL, LANGUAGE_ROOTGLOBAL, LANGUAGE_VOX)	//AEIOU edit: Removes Skrellian from assisted languages as a patch
 
 	min_age = 18
 	max_age = 80
@@ -156,8 +157,9 @@
 	icobase_tail = 1
 	unarmed_types = list(/datum/unarmed_attack/stomp, /datum/unarmed_attack/kick, /datum/unarmed_attack/claws, /datum/unarmed_attack/bite/sharp)
 	num_alternate_languages = 3
-	secondary_langs = list(LANGUAGE_SIIK)
-	name_language = LANGUAGE_SIIK
+	secondary_langs = list(LANGUAGE_TERMINUS)
+	name_language = LANGUAGE_TERMINUS
+	assisted_langs = list(LANGUAGE_EAL, LANGUAGE_SKRELLIAN, LANGUAGE_SKRELLIANFAR, LANGUAGE_ROOTLOCAL, LANGUAGE_ROOTGLOBAL, LANGUAGE_VOX)	//AEIOU edit: Zorren can speak Terminus unassisted.
 
 	min_age = 18
 	max_age = 80
@@ -176,6 +178,7 @@
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 	flesh_color = "#AFA59E"
 	base_color = "#333333"
+	blood_color = "#240bc4"
 	color_mult = 1
 
 	heat_discomfort_strings = list(
@@ -194,8 +197,9 @@
 	icobase_tail = 1
 	unarmed_types = list(/datum/unarmed_attack/stomp, /datum/unarmed_attack/kick, /datum/unarmed_attack/claws, /datum/unarmed_attack/bite/sharp)
 	num_alternate_languages = 3
-	secondary_langs = list(LANGUAGE_SIIK)
-	name_language = LANGUAGE_SIIK
+	secondary_langs = list(LANGUAGE_TERMINUS)
+	name_language = LANGUAGE_TERMINUS
+	assisted_langs = list(LANGUAGE_EAL, LANGUAGE_SKRELLIAN, LANGUAGE_SKRELLIANFAR, LANGUAGE_ROOTLOCAL, LANGUAGE_ROOTGLOBAL, LANGUAGE_VOX)	//AEIOU edit: Zorren can speak Terminus unassisted.
 
 	min_age = 18
 	max_age = 80
@@ -214,6 +218,7 @@
 
 	flesh_color = "#AFA59E"
 	base_color = "#333333"
+	blood_color = "#240bc4"
 	color_mult = 1
 	inherent_verbs = list(/mob/living/proc/shred_limb)
 
@@ -250,6 +255,15 @@
     which has a heavy emphasis on utilizing tail positioning and ear twitches to communicate intent."
 
 	primitive_form = "Wolpin"
+
+	/* AEIOU EDIT - Re-added and updated with new GOON CODE sounds. Check the License file for details. - HTG */
+	speech_sounds = list('sound/goonstation/voice/growl1.ogg','sound/goonstation/voice/growl2.ogg','sound/goonstation/voice/growl3.ogg')
+	speech_chance = 20
+
+	scream_verb = "howls"
+	male_scream_sound = 'sound/goonstation/voice/howl.ogg'
+	female_scream_sound = 'sound/goonstation/voice/howl.ogg'
+
 
 	spawn_flags = SPECIES_CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
@@ -361,7 +375,7 @@
 	min_age = 18
 	icobase = 'icons/mob/human_races/r_vox_old.dmi'
 	deform = 'icons/mob/human_races/r_def_vox_old.dmi'
-	inherent_verbs = list(/mob/living/proc/shred_limb)
+	inherent_verbs = list(/mob/living/proc/shred_limb, /mob/living/proc/eat_trash)
 
 datum/species/harpy
 	name = SPECIES_RAPALA

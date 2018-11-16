@@ -1,4 +1,4 @@
-/obj/structure/trash_pile
+/obj/structure/trash_pile //VIRGO ONE
 	name = "trash pile"
 	desc = "A heap of garbage, but maybe there's something interesting inside?"
 	icon = 'icons/obj/trash_piles.dmi'
@@ -19,6 +19,7 @@
 	//Alpha and beta lists are in their respective procs.
 	var/global/list/unique_gamma = list(
 		/obj/item/device/perfect_tele,
+		/obj/item/weapon/gun/projectile/shotgun/pump/rifle/pocketrifle,
 		/obj/item/weapon/bluespace_harpoon,
 		/obj/item/weapon/gun/energy/netgun,
 		/obj/item/weapon/gun/projectile/pirate,
@@ -113,12 +114,14 @@
 					I = produce_beta_item()
 				else if(luck <= chance_alpha+chance_beta+chance_gamma)
 					I = produce_gamma_item()
+					rare_trash_found++//aeiou edit
 
 				//We either have an item to hand over or we don't, at this point!
 				if(I)
 					searchedby += user.ckey
 					I.forceMove(get_turf(src))
 					to_chat(H,"<span class='notice'>You found \a [I]!</span>")
+					trash_piles_searched++//aeiou edit
 
 	else
 		return ..()
@@ -290,6 +293,7 @@
 	. = ..()
 	var/atom/A = get_holder_at_turf_level(src)
 	A.visible_message("[.] crawls out of \the [src].")
+	mouse_spawned_shift++//aeiou edit
 
 /obj/structure/mob_spawner/mouse_nest/get_death_report(var/mob/living/L)
 	..()

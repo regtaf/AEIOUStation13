@@ -45,12 +45,18 @@ SUBSYSTEM_DEF(transcore)
 		current_run.len--
 
 		//Remove if not in a human anymore.
-		if(!imp || !ishuman(imp.loc))
+		if(!imp || !isorgan(imp.loc))
 			implants -= imp
 			continue
 
-		//We're in a human, at least.
-		var/mob/living/carbon/human/H = imp.loc
+		//We're in an organ, at least.
+		var/obj/item/organ/external/EO = imp.loc
+		var/mob/living/carbon/human/H = EO.owner
+		if(!H)
+			implants -= imp
+			continue
+
+		//In a human	
 		BITSET(H.hud_updateflag, BACKUP_HUD)
 
 		if(H == imp.imp_in && H.mind && H.stat < DEAD)
@@ -139,10 +145,12 @@ SUBSYSTEM_DEF(transcore)
 					var/datum/nifsoft/nifsoft = N
 					nifsofts += nifsoft.type
 			MR.nif_software = nifsofts
+			MR.nif_savedata = nif.save_data.Copy()
 		else if(isnull(nif)) //Didn't pass anything, so no NIF
 			MR.nif_path = null
 			MR.nif_durability = null
 			MR.nif_software = null
+			MR.nif_savedata = null
 
 	else
 		MR = new(mind, mind.current, add_to_db = TRUE, one_time = one_time)

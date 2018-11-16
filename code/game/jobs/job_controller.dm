@@ -103,6 +103,12 @@ var/global/datum/controller/occupations/job_master
 			if(flag && (!player.client.prefs.be_special & flag))
 				Debug("FOC flag failed, Player: [player], Flag: [flag], ")
 				continue
+			// // // Begin AEIOU edit // // //
+			if(player.mind && player.mind.special_role)		//are we antagonist?
+				if(job in player.mind.antag_job_restrictions)			//Is our role in the antag restricted jobs?
+					Debug("FOC incompatible with antagonist role, Player: [player], Antag: [player.mind.special_role]")
+					continue
+			// // // End AEIOU edit // // //
 			if(player.client.prefs.GetJobDepartment(job, level) & job.flag)
 				Debug("FOC pass, Player: [player], Level:[level]")
 				candidates += player
@@ -281,6 +287,17 @@ var/global/datum/controller/occupations/job_master
 					if(!job.player_old_enough(player.client))
 						Debug("DO player not old enough, Player: [player], Job:[job.title]")
 						continue
+					
+					// // // BEGIN AEIOU EDIT // // //
+					/* 
+					 * Theoretically fixes an issue where a player could join as a whitelisted job if it was selected before 
+					 * the whitelist made them unable to select it. This only denies them the ability to spawn as the job, it
+					 * does not unset it in their preferences. ^Spitzer
+					 */
+					if(!is_job_whitelisted(player, job.title))
+						Debug("DO player not whitelisted for this job, Player: [player], Job: [job.title]")
+						continue
+					// // // END AEIOU EDIT // // //
 
 					// If the player wants that job on this level, then try give it to him.
 					if(player.client.prefs.GetJobDepartment(job, level) & job.flag)
@@ -391,7 +408,8 @@ var/global/datum/controller/occupations/job_master
 							H.amend_exploitable(G.path)
 
 						if(G.slot == "implant")
-							H.implant_loadout(G)
+							var/obj/item/weapon/implant/I = G.spawn_item(H)
+							I.implant_loadout(H)
 							continue
 
 						if(G.slot && !(G.slot in custom_equip_slots))
@@ -432,6 +450,8 @@ var/global/datum/controller/occupations/job_master
 			H << "Your job is [rank] and the game just can't handle it! Please report this bug to an administrator."
 
 		H.job = rank
+		log_game("JOINED [key_name(H)] as \"[rank]\"")
+		log_game("SPECIES [key_name(H)] is a: \"[H.species.name]\"") //VOREStation Add
 
 		// If they're head, give them the account info for their department
 		if(H.mind && job.head_position)

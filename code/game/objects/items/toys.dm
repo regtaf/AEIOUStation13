@@ -768,7 +768,7 @@
 	name = "space carp plushie"
 	desc = "An adorable stuffed toy that resembles a space carp."
 	icon = 'icons/obj/toy.dmi'
-	icon_state = "plushie/carp"
+	icon_state = "basecarp"
 	attack_verb = list("bitten", "eaten", "fin slapped")
 	var/bitesound = 'sound/weapons/bite.ogg'
 
@@ -787,39 +787,49 @@
 	name = "Random Carp Plushie"
 	desc = "This is a random plushie"
 	icon = 'icons/obj/toy.dmi'
-	icon_state = "plushie/carp"
+	icon_state = "basecarp"
 
 /obj/random/carp_plushie/item_to_spawn()
 	return pick(typesof(/obj/item/toy/plushie/carp)) //can pick any carp plushie, even the original.
 
 /obj/item/toy/plushie/carp/ice
+	name = "ice carp plushie"
 	icon_state = "icecarp"
 
 /obj/item/toy/plushie/carp/silent
+	name = "monochrome carp plushie"
 	icon_state = "silentcarp"
 
 /obj/item/toy/plushie/carp/electric
+	name = "electric carp plushie"
 	icon_state = "electriccarp"
 
 /obj/item/toy/plushie/carp/gold
+	name = "golden carp plushie"
 	icon_state = "goldcarp"
 
 /obj/item/toy/plushie/carp/toxin
+	name = "toxic carp plushie"
 	icon_state = "toxincarp"
 
 /obj/item/toy/plushie/carp/dragon
+	name = "dragon carp plushie"
 	icon_state = "dragoncarp"
 
 /obj/item/toy/plushie/carp/pink
+	name = "pink carp plushie"
 	icon_state = "pinkcarp"
 
 /obj/item/toy/plushie/carp/candy
+	name = "candy carp plushie"
 	icon_state = "candycarp"
 
 /obj/item/toy/plushie/carp/nebula
+	name = "nebula carp plushie"
 	icon_state = "nebulacarp"
 
 /obj/item/toy/plushie/carp/void
+	name = "void carp plushie"
 	icon_state = "voidcarp"
 
 //Large plushies.
@@ -877,6 +887,7 @@
 	icon_state = "nymphplushie"
 	w_class = ITEMSIZE_TINY
 	var/last_message = 0
+	var/pokephrase = "Uww!"
 
 /obj/item/toy/plushie/attack_self(mob/user as mob)
 	if(world.time - last_message <= 1 SECOND)
@@ -889,6 +900,7 @@
 		user.visible_message("<span class='warning'><b>\The [user]</b> attempts to strangle [src]!</span>","<span class='warning'>You attempt to strangle [src]!</span>")
 	else
 		user.visible_message("<span class='notice'><b>\The [user]</b> pokes [src].</span>","<span class='notice'>You poke [src].</span>")
+		visible_message("[src] says, \"[pokephrase]\"")
 	last_message = world.time
 
 /obj/item/toy/plushie/verb/rename_plushie()
@@ -916,121 +928,199 @@
 	name = "diona nymph plush"
 	desc = "A plushie of an adorable diona nymph! While its level of self-awareness is still being debated, its level of cuteness is not."
 	icon_state = "nymphplushie"
+	pokephrase = "Chirp!"
 
 /obj/item/toy/plushie/mouse
 	name = "mouse plush"
 	desc = "A plushie of a delightful mouse! What was once considered a vile rodent is now your very best friend."
 	icon_state = "mouseplushie"
+	pokephrase = "Squeak!"
 
 /obj/item/toy/plushie/kitten
 	name = "kitten plush"
 	desc = "A plushie of a cute kitten! Watch as it purrs its way right into your heart."
 	icon_state = "kittenplushie"
+	pokephrase = "Mrow!"
 
 /obj/item/toy/plushie/lizard
 	name = "lizard plush"
 	desc = "A plushie of a scaly lizard! Very controversial, after being accused as \"racist\" by some Unathi."
 	icon_state = "lizardplushie"
+	pokephrase = "Hiss!"
 
 /obj/item/toy/plushie/spider
 	name = "spider plush"
 	desc = "A plushie of a fuzzy spider! It has eight legs - all the better to hug you with."
 	icon_state = "spiderplushie"
+	pokephrase = "Sksksk!"
 
 /obj/item/toy/plushie/farwa
 	name = "farwa plush"
 	desc = "A farwa plush doll. It's soft and comforting!"
 	icon_state = "farwaplushie"
+	pokephrase = "Squaw!"
 
 /obj/item/toy/plushie/corgi
 	name = "corgi plushie"
 	icon_state = "corgi"
+	pokephrase = "Woof!"
 
 /obj/item/toy/plushie/girly_corgi
 	name = "corgi plushie"
 	icon_state = "girlycorgi"
+	pokephrase = "Arf!"
 
 /obj/item/toy/plushie/robo_corgi
 	name = "borgi plushie"
 	icon_state = "robotcorgi"
+	pokephrase = "Bark."
 
 /obj/item/toy/plushie/octopus
 	name = "octopus plushie"
 	icon_state = "loveable"
+	pokephrase = "Squish!"
 
 /obj/item/toy/plushie/face_hugger
 	name = "facehugger plushie"
 	icon_state = "huggable"
+	pokephrase = "Hug!"
 
 //foxes are basically the best
 
 /obj/item/toy/plushie/red_fox
 	name = "red fox plushie"
 	icon_state = "redfox"
+	pokephrase = "Gecker!"
 
 /obj/item/toy/plushie/black_fox
 	name = "black fox plushie"
 	icon_state = "blackfox"
+	pokephrase = "Ack!"
 
 /obj/item/toy/plushie/marble_fox
 	name = "marble fox plushie"
 	icon_state = "marblefox"
+	pokephrase = "Awoo!"
 
 /obj/item/toy/plushie/blue_fox
 	name = "blue fox plushie"
 	icon_state = "bluefox"
+	pokephrase = "Yoww!"
 
 /obj/item/toy/plushie/orange_fox
 	name = "orange fox plushie"
 	icon_state = "orangefox"
+	pokephrase = "Yagh!"
 
 /obj/item/toy/plushie/coffee_fox
 	name = "coffee fox plushie"
 	icon_state = "coffeefox"
+	pokephrase = "Gerr!"
 
 /obj/item/toy/plushie/pink_fox
 	name = "pink fox plushie"
 	icon_state = "pinkfox"
+	pokephrase = "Yack!"
 
 /obj/item/toy/plushie/purple_fox
 	name = "purple fox plushie"
 	icon_state = "purplefox"
+	pokephrase = "Whine!"
 
 /obj/item/toy/plushie/crimson_fox
 	name = "crimson fox plushie"
 	icon_state = "crimsonfox"
+	pokephrase = "Auuu!"
 
 /obj/item/toy/plushie/deer
 	name = "deer plushie"
 	icon_state = "deer"
+	pokephrase = "Bleat!"
 
 /obj/item/toy/plushie/black_cat
 	name = "black cat plushie"
 	icon_state = "blackcat"
+	pokephrase = "Mlem!"
 
 /obj/item/toy/plushie/grey_cat
 	name = "grey cat plushie"
 	icon_state = "greycat"
+	pokephrase = "Mraw!"
 
 /obj/item/toy/plushie/white_cat
 	name = "white cat plushie"
 	icon_state = "whitecat"
+	pokephrase = "Mew!"
 
 /obj/item/toy/plushie/orange_cat
 	name = "orange cat plushie"
 	icon_state = "orangecat"
+	pokephrase = "Meow!"
 
 /obj/item/toy/plushie/siamese_cat
 	name = "siamese cat plushie"
 	icon_state = "siamesecat"
+	pokephrase = "Mrew?"
 
 /obj/item/toy/plushie/tabby_cat
 	name = "tabby cat plushie"
 	icon_state = "tabbycat"
+	pokephrase = "Purr!"
 
 /obj/item/toy/plushie/tuxedo_cat
 	name = "tuxedo cat plushie"
 	icon_state = "tuxedocat"
+	pokephrase = "Mrowww!!"
+
+// nah, squids are better than foxes :>
+
+/obj/item/toy/plushie/squid/green
+	name = "green squid plushie"
+	desc = "A small, cute and loveable squid friend. This one is green."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "greensquid"
+	slot_flags = SLOT_HEAD
+	pokephrase = "Squrr!"
+
+/obj/item/toy/plushie/squid/mint
+	name = "mint squid plushie"
+	desc = "A small, cute and loveable squid friend. This one is mint coloured."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "mintsquid"
+	slot_flags = SLOT_HEAD
+	pokephrase = "Blurble!"
+
+/obj/item/toy/plushie/squid/blue
+	name = "blue squid plushie"
+	desc = "A small, cute and loveable squid friend. This one is blue."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "bluesquid"
+	slot_flags = SLOT_HEAD
+	pokephrase = "Blob!"
+
+/obj/item/toy/plushie/squid/orange
+	name = "orange squid plushie"
+	desc = "A small, cute and loveable squid friend. This one is orange."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "orangesquid"
+	slot_flags = SLOT_HEAD
+	pokephrase = "Squash!"
+
+/obj/item/toy/plushie/squid/yellow
+	name = "yellow squid plushie"
+	desc = "A small, cute and loveable squid friend. This one is yellow."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "yellowsquid"
+	slot_flags = SLOT_HEAD
+	pokephrase = "Glorble!"
+
+/obj/item/toy/plushie/squid/pink
+	name = "pink squid plushie"
+	desc = "A small, cute and loveable squid friend. This one is pink."
+	icon = 'icons/obj/toy.dmi'
+	icon_state = "pinksquid"
+	slot_flags = SLOT_HEAD
+	pokephrase = "Wobble!"
 
 /obj/item/toy/plushie/therapy/red
 	name = "red therapy doll"

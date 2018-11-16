@@ -27,6 +27,9 @@
 	playsound(loc,"canopen", rand(10,50), 1)
 	user << "<span class='notice'>You open [src] with an audible pop!</span>"
 	flags |= OPENCONTAINER
+	cans_opened += 1//aeiou edit
+
+
 
 /obj/item/weapon/reagent_containers/food/drinks/attack(mob/M as mob, mob/user as mob, def_zone)
 	if(force && !(flags & NOBLUDGEON) && user.a_intent == I_HURT)
@@ -311,3 +314,13 @@
 /obj/item/weapon/reagent_containers/food/drinks/britcup/on_reagent_change()
 	..()
 
+
+
+/obj/item/weapon/reagent_containers/food/drinks/papercup_scp
+	name = "paper cup"
+	desc = "Absolutely normal paper cup ."
+	icon_state = "coffee"
+	center_of_mass = list("x"=15, "y"=10)
+/obj/item/weapon/reagent_containers/food/drinks/papercup_scp/New()
+	..()
+//	reagents.add_reagent("ice", 30)

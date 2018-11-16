@@ -19,20 +19,10 @@
 	var/use_external_power = 0 //if set, the weapon will look for an external power source to draw from, otherwise it recharges magically
 	var/recharge_time = 4
 	var/charge_tick = 0
+	var/infinite_supply = 0 //AEIOU edit. This is for the gatling icons.
 	var/charge_delay = 75	//delay between firing and charging
-
+	recoil_m = 0 //micros getting fucked
 	var/battery_lock = 0	//If set, weapon cannot switch batteries
-
-/obj/item/weapon/gun/energy/attackby(var/obj/item/A as obj, mob/user as mob)
-	..()
-
-/obj/item/weapon/gun/energy/switch_firemodes(mob/user)
-	if(..())
-		update_icon()
-
-/obj/item/weapon/gun/energy/emp_act(severity)
-	..()
-	update_icon()
 
 /obj/item/weapon/gun/energy/New()
 	..()
@@ -51,6 +41,9 @@
 	if(self_recharge)
 		processing_objects.Remove(src)
 	return ..()
+
+/obj/item/weapon/gun/energy/get_cell()
+	return power_supply
 
 /obj/item/weapon/gun/energy/process()
 	if(self_recharge) //Every [recharge_time] ticks, recharge a shot for the battery
@@ -74,6 +67,17 @@
 		else
 			charge_tick = 0
 	return 1
+
+/obj/item/weapon/gun/energy/attackby(var/obj/item/A as obj, mob/user as mob)
+	..()
+
+/obj/item/weapon/gun/energy/switch_firemodes(mob/user)
+	if(..())
+		update_icon()
+
+/obj/item/weapon/gun/energy/emp_act(severity)
+	..()
+	update_icon()
 
 /obj/item/weapon/gun/energy/consume_next_projectile()
 	if(!power_supply) return null
@@ -144,7 +148,7 @@
 	return null
 
 /obj/item/weapon/gun/energy/examine(mob/user)
-	..(user)
+	. = ..()
 	if(power_supply)
 		var/shots_remaining = round(power_supply.charge / charge_cost)
 		user << "Has [shots_remaining] shot\s remaining."
@@ -153,6 +157,9 @@
 	return
 
 /obj/item/weapon/gun/energy/update_icon(var/ignore_inhands)
+	if(infinite_supply)//AEIOU edit. This is for the gatling icons.)//aeiou edit
+		icon_state = icon_state
+		return
 	if(power_supply == null)
 		if(modifystate)
 			icon_state = "[modifystate]_open"

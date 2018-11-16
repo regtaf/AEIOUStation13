@@ -1,22 +1,22 @@
 /datum/trait/metabolism_up
 	name = "Fast Metabolism"
-	desc = "You process ingested and injected reagents faster, but get hungry faster."
+	desc = "You process ingested and injected reagents faster, but get hungry faster (Teshari speed)."
 	cost = 0
-	var_changes = list("metabolic_rate" = 1.2, "hunger_factor" = 0.2, "metabolism" = 0.005) //Teshari level
+	var_changes = list("metabolic_rate" = 1.2, "hunger_factor" = 0.2, "metabolism" = 0.06) // +20% rate and 4x hunger (Teshari level)
 	excludes = list(/datum/trait/metabolism_down, /datum/trait/metabolism_apex)
 
 /datum/trait/metabolism_down
 	name = "Slow Metabolism"
 	desc = "You process ingested and injected reagents slower, but get hungry slower."
 	cost = 0
-	var_changes = list("metabolic_rate" = 0.8, "hunger_factor" = 0.04, "metabolism" = 0.001)
+	var_changes = list("metabolic_rate" = 0.8, "hunger_factor" = 0.04, "metabolism" = 0.0012) // -20% of default.
 	excludes = list(/datum/trait/metabolism_up, /datum/trait/metabolism_apex)
 
 /datum/trait/metabolism_apex
 	name = "Apex Metabolism"
-	desc = "Finally a proper excuse for your predatory actions. Also makes you process reagents faster but that's totally irrelevant. May cause excessive immersions with large/taur characters. Not recommended for efficient law-abiding workers or eco-aware NIF users."
+	desc = "Finally a proper excuse for your predatory actions. Essentially doubles the fast trait rates. Good for characters with big appetites."
 	cost = 0
-	var_changes = list("metabolic_rate" = 1.5, "hunger_factor" = 0.3, "metabolism" = 0.0075)
+	var_changes = list("metabolic_rate" = 1.4, "hunger_factor" = 0.4, "metabolism" = 0.012) // +40% rate and 8x hunger (Double Teshari)
 	excludes = list(/datum/trait/metabolism_up, /datum/trait/metabolism_down)
 
 /datum/trait/cold_discomfort
@@ -25,6 +25,16 @@
 	cost = 0
 	var_changes = list("heat_discomfort_level" = T0C+19)
 	excludes = list(/datum/trait/hot_discomfort)
+
+
+/datum/trait/italian
+	name = "Italian"
+	desc = "Mama mia!"
+	cost = 0
+	var_changes = list("italian" = 1)
+	apply(var/datum/species/S,var/mob/living/carbon/human/H)
+		..(S,H)
+		H.italian = 1
 
 /datum/trait/hot_discomfort
 	name = "Cold-Blooded"

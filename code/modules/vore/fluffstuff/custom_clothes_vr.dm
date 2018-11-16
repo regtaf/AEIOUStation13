@@ -79,7 +79,7 @@
 /obj/item/clothing/suit/storage/hooded/wintercoat/roiz/proc/RemoveHood_roiz()
 	icon_state = "coatroiz"
 	item_state = "coatroiz_mob"
-	suittoggled = 0
+	hood_up = 0
 	if(ishuman(hood.loc))
 		var/mob/living/carbon/H = hood.loc
 		H.unEquip(hood, 1)
@@ -87,7 +87,7 @@
 	hood.loc = src
 
 /obj/item/clothing/suit/storage/hooded/wintercoat/roiz/proc/ToggleHood_roiz()
-	if(!suittoggled)
+	if(!hood_up)
 		if(ishuman(loc))
 			var/mob/living/carbon/human/H = loc
 			if(H.wear_suit != src)
@@ -98,7 +98,7 @@
 				return
 			else
 				H.equip_to_slot_if_possible(hood,slot_head,0,0,1)
-				suittoggled = 1
+				hood_up = 1
 				icon_state = "coatroiz_t"
 				item_state = "coatroiz_mob_t"
 				H.update_inv_wear_suit()
@@ -730,11 +730,11 @@
 
 /obj/item/weapon/storage/belt/utility/fluff/vulpine/New()
 	..()
-	new /obj/item/weapon/screwdriver(src)
-	new /obj/item/weapon/wrench(src)
+	new /obj/item/weapon/tool/screwdriver(src)
+	new /obj/item/weapon/tool/wrench(src)
 	new /obj/item/weapon/weldingtool(src)
-	new /obj/item/weapon/crowbar(src)
-	new /obj/item/weapon/wirecutters(src)
+	new /obj/item/weapon/tool/crowbar(src)
+	new /obj/item/weapon/tool/wirecutters(src)
 	new /obj/item/device/multitool(src)
 	new /obj/item/stack/cable_coil(src, 30, "red")
 
@@ -910,7 +910,7 @@
 	icon_state = "khi_uniform_cmd_i"
 	item_state = "khi_uniform_cmd"
 	worn_state = "khi_uniform_cmd"
-	armor = list(melee = 5, bullet = 10, laser = 10, energy = 0, bomb = 0, bio = 0, rad = 0)
+	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 0, bio = 0, rad = 0)
 
 /obj/item/clothing/under/rank/khi/sec //Security version
 	name = "KHI security suit"
@@ -926,7 +926,7 @@
 	icon_state = "khi_uniform_med_i"
 	item_state = "khi_uniform_med"
 	worn_state = "khi_uniform_med"
-	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 0, bio = 50, rad = 5)
+	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 0, bio = 10, rad = 0)
 
 /obj/item/clothing/under/rank/khi/eng //Engineering version
 	name = "KHI engineering suit"
@@ -942,7 +942,7 @@
 	icon_state = "khi_uniform_sci_i"
 	item_state = "khi_uniform_sci"
 	worn_state = "khi_uniform_sci"
-	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 5, bio = 0, rad = 5)
+	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 10, bio = 0, rad = 0)
 
 /obj/item/clothing/under/rank/khi/fluff/aronai //Aro fluff version
 	name = "KHI meditech suit"
@@ -950,7 +950,7 @@
 	icon_state = "khi_uniform_aro_i"
 	item_state = "khi_uniform_aro"
 	worn_state = "khi_uniform_aro"
-	armor = list(melee = 5, bullet = 5, laser = 5, energy = 0, bomb = 0, bio = 0, rad = 0)
+	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 0, bio = 10, rad = 0)
 
 //jacobdragon:Earthen Breath
 /obj/item/clothing/under/fluff/earthenbreath
@@ -1192,14 +1192,14 @@ Departamental Swimsuits, for general use
 	desc = "The uniform worn by command officers in the mid 2260s."
 	icon_state = "trek_command"
 	item_state = "trek_command"
-	armor = list(melee = 10, bullet = 10, laser = 10,energy = 0, bomb = 0, bio = 10, rad = 10, fire = 0, acid = 0) // Considering only staff heads get to pick it
+	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0) // Considering only staff heads get to pick it
 
 /obj/item/clothing/under/rank/trek/engsec
 	name = "Operations Uniform"
 	desc = "The uniform worn by operations officers of the mid 2260s. You feel strangely vulnerable just seeing this..."
 	icon_state = "trek_engsec"
 	item_state = "trek_engsec"
-	armor = list(melee = 10, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 10, fire = 0, acid = 0) // since they're shared between jobs and kinda moot.
+	armor = list(melee = 10, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0) // since they're shared between jobs and kinda moot.
 
 /obj/item/clothing/under/rank/trek/medsci
 	name = "MedSci Uniform"
@@ -1207,7 +1207,7 @@ Departamental Swimsuits, for general use
 	icon_state = "trek_medsci"
 	item_state = "trek_medsci"
 	permeability_coefficient = 0.50
-	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 10, rad = 0, fire = 0, acid = 0) // basically a copy of vanilla sci/med
+	armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 10, rad = 0) // basically a copy of vanilla sci/med
 
 //TNG
 /obj/item/clothing/under/rank/trek/command/next
@@ -1313,18 +1313,13 @@ Departamental Swimsuits, for general use
 /obj/item/clothing/suit/storage/hooded/wintercoat/jessie
 	name = "Handmade Winter Suit"
 	desc = "A durable, but somewhat ragged lower portion of a snow suit fitted for a wolftaur."
-	icon = 'icons/mob/taursuits_vr.dmi'
-	icon_override = 'icons/mob/taursuits_vr.dmi'
+	icon = 'icons/mob/taursuits_wolf_vr.dmi'
 	icon_state = "jessiecoat"
+	item_state = "jessiecoat"
 
 /obj/item/clothing/suit/storage/hooded/wintercoat/jessie/mob_can_equip(var/mob/living/carbon/human/H, slot, disable_warning = 0)
 	if(..())
 		if(istype(H) && istype(H.tail_style, /datum/sprite_accessory/tail/taur/wolf))
-			if(icon_state == "jessiecoat")
-				return ..()
-			icon_override = 'icons/mob/taursuits_vr.dmi'
-			icon_state = "jessiecoat"
-			pixel_x = -16
 			return ..()
 		else
 			to_chat(H, "<span class='warning'>You need to have a wolf-taur half to wear this.</span>")
@@ -1335,19 +1330,13 @@ Departamental Swimsuits, for general use
 	name = "Kat's Fox Taur Armor"
 	desc = "A set of security armor, light weight and easy to run in for a Taur, this item protects the \
 	entire body."
-	icon = 'icons/mob/taursuits_vr.dmi'
-	icon_override = 'icons/mob/taursuits_vr.dmi'
+	icon = 'icons/mob/taursuits_wolf_vr.dmi'
 	icon_state = "katesuit"
 	item_state_slots = null
 
 /obj/item/clothing/suit/armor/vest/wolftaur/kate/mob_can_equip(var/mob/living/carbon/human/H, slot, disable_warning = 0)
 	if(..())
 		if(istype(H) && istype(H.tail_style, /datum/sprite_accessory/tail/taur/wolf))
-			if(icon_state == "katesuit")
-				return ..()
-			icon_override = 'icons/mob/taursuits_vr.dmi'
-			icon_state = "katesuit"
-			pixel_x = -16
 			return ..()
 		else
 			to_chat(H, "<span class='warning'>You need to have a wolf-taur half to wear this.</span>")
@@ -1359,24 +1348,11 @@ Departamental Swimsuits, for general use
 	desc = "Taur engineering voidsuit. Recolored navy blue and white. Slightly tweaked as well to \
 	get close to having security voidsuit protection as possible with a slight reduction in movement \
 	speed to compensate for custom padding and armor Kateryna made herself."
-	icon = 'icons/mob/taursuits_vr.dmi'
-	icon_override = 'icons/mob/taursuits_vr.dmi'
+	icon = 'icons/mob/taursuits_wolf_vr.dmi'
 	icon_state = "lilithsuit"
+	item_state = "lilithsuit"
 	species_restricted = null
 	armor = list(melee = 40, bullet = 20, laser = 20,energy = 5, bomb = 35, bio = 100, rad = 20)
-
-/obj/item/clothing/suit/space/void/engineering/kate/mob_can_equip(var/mob/living/carbon/human/H, slot, disable_warning = 0)
-	if(..())
-		if(istype(H) && istype(H.tail_style, /datum/sprite_accessory/tail/taur/wolf))
-			if(icon_state == "lilithsuit")
-				return ..()
-			icon_override = 'icons/mob/taursuits_vr.dmi'
-			icon_state = "lilithsuit"
-			pixel_x = -16
-			return ..()
-		else
-			to_chat(H, "<span class='warning'>You need to have a wolf-taur half to wear this.</span>")
-			return 0
 
 //samanthafyre:Kateryna Petrovitch
 /obj/item/clothing/head/helmet/space/fluff/kate
@@ -1570,7 +1546,7 @@ Departamental Swimsuits, for general use
 /obj/item/clothing/suit/storage/hooded/wintercoat/kilanocoat/proc/RemoveHood_kilano()
 	icon_state = "kilanocoat"
 	item_state = "kilanocoat_mob"
-	suittoggled = 0
+	hood_up = 0
 	if(ishuman(hood.loc))
 		var/mob/living/carbon/H = hood.loc
 		H.unEquip(hood, 1)
@@ -1578,7 +1554,7 @@ Departamental Swimsuits, for general use
 	hood.loc = src
 
 /obj/item/clothing/suit/storage/hooded/wintercoat/kilanocoat/proc/ToggleHood_kilano()
-	if(!suittoggled)
+	if(!hood_up)
 		if(ishuman(loc))
 			var/mob/living/carbon/human/H = loc
 			if(H.wear_suit != src)
@@ -1589,7 +1565,7 @@ Departamental Swimsuits, for general use
 				return
 			else
 				H.equip_to_slot_if_possible(hood,slot_head,0,0,1)
-				suittoggled = 1
+				hood_up = 1
 				icon_state = "kilanocoat_t"
 				item_state = "kilanocoat_mob_t"
 				H.update_inv_wear_suit()
@@ -1704,8 +1680,9 @@ Departamental Swimsuits, for general use
 
 //Mewchild: Phi Vietsi
 /obj/item/clothing/gloves/ring/seal/signet/fluff/vietsi
-	name = "signet ring"
-	desc = "A signet ring carved from the bones of something long extinct, as a ward against bad luck."
+	name = "Phi Vietsi's Bone Signet Ring"
+	desc = "A signet ring belonging to Phi Vietsi, carved from the bones of something long extinct, as a ward against bad luck."
+	var/signet_name = "Phi Vietsi"
 
 	icon = 'icons/vore/custom_clothes_vr.dmi'
 	icon_state = "vietsi_ring"
@@ -1785,17 +1762,16 @@ Departamental Swimsuits, for general use
 	armor = list(melee = 0, bullet = 0, laser = 0, energy = 0, bomb = 0, bio = 0, rad = 0)
 	desc = "A series of armor plates painted black, deployed from a back-mounted module. They fit smoothly over the unit's armor plates and projects a skintight bubble shield over the unit's uncovered parts. Faceplate and coolant unit not included."
 	species_restricted = null
-	icon = 'icons/mob/taursuits_vr.dmi'
-	icon_override = 'icons/mob/taursuits_vr.dmi'
+	icon = 'icons/mob/taursuits_lizard_vr.dmi'
 	icon_state = "hasd_suit"
 	item_state = "hasd_suit"
 	pixel_x = -16
 
 	mob_can_equip(var/mob/living/carbon/human/H, slot, disable_warning = 0)
-		if(..() && istype(H) && H.ckey == "silencedmp5a5" && istype(H.tail_style, /datum/sprite_accessory/tail/taur/lizard/synthlizard))
+		if(..() && istype(H) && H.ckey == "silencedmp5a5")
 			return 1
 		else
-			H << "<span class='warning'>This suit is not designed for you.</span>"
+			to_chat(H,"<span class='warning'>This suit is not designed for you.</span>")
 			return 0
 
 //Zigfe:Zaoozaoo Xrimxuqmqixzix
@@ -1808,3 +1784,19 @@ Departamental Swimsuits, for general use
 
 	icon_override = 'icons/vore/custom_clothes_vr.dmi'
 	item_state = "zao_cap_mob"
+
+//Nepox:Annie Rose
+/obj/item/clothing/accessory/sweater/fluff/annie
+	name = "Lazy Annie's Lazy Sweater"
+	desc = "A cozy sweater that's probably far too long for it's owner.  She's too lazy to care though."
+
+	icon = 'icons/vore/custom_clothes_vr.dmi'
+	icon_state = "sweater_annie"
+
+	icon_override = 'icons/vore/custom_clothes_vr.dmi'
+	item_state = "sweater_annie"
+
+	slot_flags = SLOT_OCLOTHING | SLOT_TIE
+	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
+	w_class = ITEMSIZE_NORMAL
+	slot = ACCESSORY_SLOT_OVER

@@ -65,6 +65,12 @@ var/global/datum/controller/gameticker/ticker
 						for(var/i=0, i<10, i++)
 							sleep(1)
 							vote.process()
+
+			// // // AEIOU EDIT: Tip of the Round // // //
+			if((pregame_timeleft <= send_tip_at) && !tip_sent)		//it's time to send a tip
+				send_tip_of_the_round()
+			// // // END AEIOU EDIT: Tip of the Round // // //
+
 			if(pregame_timeleft <= 0)
 				current_state = GAME_STATE_SETTING_UP
 				Master.SetRunLevel(RUNLEVEL_SETUP)
@@ -361,6 +367,7 @@ var/global/datum/controller/gameticker/ticker
 						time_left -= 1 MINUTES
 						sleep(600)
 					if(!delay_end)
+						to_chat(world, "<span class='notice'><b>Round ended. Rebooting world.</b></span>")		//AEIOU edit
 						world.Reboot()
 					else
 						to_chat(world, "<span class='notice'><b>An admin has delayed the round end.</b></span>")
@@ -382,6 +389,7 @@ var/global/datum/controller/gameticker/ticker
 		return 1
 
 /datum/controller/gameticker/proc/declare_completion()
+	world.log <<  "Round ended. Mode: [mode.name]."		//AEIOU edit: log to console that the round is over
 	world << "<br><br><br><H1>A round of [mode.name] has ended!</H1>"
 	for(var/mob/Player in player_list)
 		if(Player.mind && !isnewplayer(Player))
@@ -461,5 +469,12 @@ var/global/datum/controller/gameticker/ticker
 	log_game("Antagonists at round end were...")
 	for(var/i in total_antagonists)
 		log_game("[i]s[total_antagonists[i]].")
+
+	/*
+	for(var/i = 1 to 10)
+		world << "<b>Shift facts!</b>"
+		var/line = pick_n_take(fluff_info)
+		world << line
+	*/
 
 	return 1

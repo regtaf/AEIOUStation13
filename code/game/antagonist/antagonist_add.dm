@@ -7,6 +7,9 @@
 	if(flags & ANTAG_OVERRIDE_JOB)
 		player.assigned_role = role_text
 	player.special_role = role_text
+	
+	//AEIOU edit: Adds antag job restrictions to player's mind datum for job selection.
+	player.antag_job_restrictions = restricted_jobs
 
 	if(istype(player.current, /mob/observer/dead))
 		create_default(player.current)
@@ -36,7 +39,7 @@
 			and it otherwise has no bearing on your round.</span>"
 	player.current.verbs |= /mob/living/proc/write_ambition
 
-	if(can_use_aooc)
+	if(can_speak_aooc)
 		player.current.client.verbs += /client/proc/aooc
 
 	// Handle only adding a mind and not bothering with gear etc.

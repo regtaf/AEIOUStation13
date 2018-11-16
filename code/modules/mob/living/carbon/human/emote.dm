@@ -1,6 +1,6 @@
 /mob/living/carbon/human/emote(var/act,var/m_type=1,var/message = null)
 	var/param = null
-	
+
 	var/datum/gender/T = gender_datums[get_visible_gender()]
 
 	if (findtext(act, "-", 1, null))
@@ -14,9 +14,10 @@
 	var/muzzled = is_muzzled()
 	//var/m_type = 1
 
-	for (var/obj/item/weapon/implant/I in src)
-		if (I.implanted)
-			I.trigger(act, src)
+	for(var/obj/item/organ/O in src.organs)
+		for (var/obj/item/weapon/implant/I in O)
+			if (I.implanted)
+				I.trigger(act, src)
 
 	if(src.stat == 2.0 && (act != "deathgasp"))
 		return
@@ -80,10 +81,11 @@
 
 		//Promethean-only emotes
 		if("squish")
-			if(!species.bump_flag == SLIME) //That should do, yaya.
+			/* VOREStation Removal Start - Eh. People can squish maybe.
+			if(species.bump_flag != SLIME) //This should definitely do it.
 				src << "<span class='warning'>You are not a slime thing!</span>"
 				return
-
+			*/ //VOREStation Removal End
 			playsound(src.loc, 'sound/effects/slime_squish.ogg', 50, 0) //Credit to DrMinky (freesound.org) for the sound.
 			message = "squishes."
 			m_type = 1
@@ -95,6 +97,10 @@
 
 		if ("blink_r")
 			message = "blinks rapidly."
+			m_type = 1
+
+		if ("gnarl")
+			message = "gnarls and shows their teeth..."
 			m_type = 1
 
 		if ("bow")
@@ -661,18 +667,16 @@
 				if(!muzzled)
 					message = "[species.scream_verb]!"
 					m_type = 2
-					/* Removed, pending the location of some actually good, properly licensed sounds.
+					/* AEIOU EDIT - Re-added and updated with new GOON CODE sounds. Check the License file for details. - HTG */
 					if(get_gender() == FEMALE)
 						playsound(loc, "[species.female_scream_sound]", 80, 1)
 					else
 						playsound(loc, "[species.male_scream_sound]", 80, 1) //default to male screams if no gender is present.
-					*/
 				else
 					message = "makes a very loud noise."
 					m_type = 2
 
-		if("snap", "snaps")
-			m_type = 2
+		if("snap", "snaps") /* AEIOU EDIT - Added feature for naughty spammers - HTG */
 			var/mob/living/carbon/human/H = src
 			var/obj/item/organ/external/L = H.get_organ("l_hand")
 			var/obj/item/organ/external/R = H.get_organ("r_hand")
@@ -683,12 +687,38 @@
 			if(R && (!(R.status & ORGAN_DESTROYED)) && (!(R.splinted)) && (!(R.status & ORGAN_BROKEN)))
 				right_hand_good = 1
 
-			if(!left_hand_good && !right_hand_good)
+			if(!left_hand_good && !right_hand_good) //This is all that is required to snap... You can snap in cuffs, right?
 				to_chat(usr, "You need at least one hand in good working order to snap your fingers.")
 				return
 
-			message = "snaps [T.his] fingers."
-			playsound(loc, 'sound/effects/fingersnap.ogg', 50, 1, -3)
+			var/safe = 99 //We have a 1% chance to break our fingers.
+			var/list/involved_parts = list(BP_L_HAND, BP_R_HAND)
+			for(var/organ_name in involved_parts)
+				var/obj/item/organ/external/E = get_organ(organ_name)
+				if(!E || E.is_stump() || E.splinted || (E.status & ORGAN_BROKEN))
+					involved_parts -= organ_name
+					safe -= 4 //Add 4% to the chance for each injured hand. (5% Chance to break our fingers in total.)
+
+			var/breaking = pick(involved_parts)
+			var/obj/item/organ/external/E = get_organ(breaking)
+
+			/* AEIOU EDIT - Added feature for naughty spammers - HTG */
+			if(prob(safe))
+				playsound(loc, 'sound/effects/fingersnap.ogg', 50, 1, -3)
+				custom_emote(1, "snaps [T.his] fingers.")
+			else
+				if(E.cannot_break)
+					src.Weaken(5)
+					E.droplimb(1,DROPLIMB_EDGE)
+					playsound(loc, 'sound/effects/snap.ogg', 50, 1)
+					custom_emote(1, "<span class='danger'>snaps [T.his] fingers right off!</span>") // I need ideas, dont let me forget! - HTG
+					log_and_message_admins("lost [T.his] [breaking] with *snap, ahahah.", src)
+				else
+					src.Weaken(5)
+					E.fracture()
+					playsound(loc, 'sound/effects/snap.ogg', 50, 1)
+					custom_emote(1, "<span class='danger'>breaks [T.his] fingers! That looked painful.</span>") // I need ideas, dont let me forget! - HTG
+					log_and_message_admins("broke [T.his] [breaking] with *snap, ahahah.", src)
 
 		if("swish")
 			src.animate_tail_once()
@@ -712,14 +742,14 @@
 		if("whistle" || "whistles")
 			if(!muzzled)
 				message = "whistles a tune."
-				playsound(loc, 'sound/misc/longwhistle.ogg') //praying this doesn't get abused
+				playsound(loc, 'sound/misc/longwhistle.ogg',50, 1, -3) //praying this doesn't get abused
 			else
 				message = "makes a light spitting noise, a poor attempt at a whistle."
 
 		if("qwhistle")
 			if(!muzzled)
 				message = "whistles quietly."
-				playsound(loc, 'sound/misc/shortwhistle.ogg')
+				playsound(loc, 'sound/misc/shortwhistle.ogg',50, 1, -3)
 			else
 				message = "makes a light spitting noise, a poor attempt at a whistle."
 
@@ -727,7 +757,7 @@
 			src << "blink, blink_r, blush, bow-(none)/mob, burp, choke, chuckle, clap, collapse, cough, cry, custom, deathgasp, drool, eyebrow, fastsway/qwag, \
 					frown, gasp, giggle, glare-(none)/mob, grin, groan, grumble, handshake, hug-(none)/mob, laugh, look-(none)/mob, moan, mumble, nod, pale, point-atom, \
 					raise, salute, scream, sneeze, shake, shiver, shrug, sigh, signal-#1-10, slap-(none)/mob, smile, sneeze, sniff, snore, stare-(none)/mob, stopsway/swag, sway/wag, swish, tremble, twitch, \
-					twitch_v, vomit, whimper, wink, yawn. Synthetics: beep, buzz, yes, no, rcough, rsneeze, ping"
+					twitch_v, vomit, whimper, whistle, qwhistle, wink, yawn. Synthetics: beep, buzz, yes, no, rcough, rsneeze, ping"
 
 		else
 			src << "<font color='blue'>Unusable emote '[act]'. Say *help for a list.</font>"
@@ -739,7 +769,7 @@
 	set name = "Set Pose"
 	set desc = "Sets a description which will be shown when someone examines you."
 	set category = "IC"
-	
+
 	var/datum/gender/T = gender_datums[get_visible_gender()]
 
 	pose =  sanitize(input(usr, "This is [src]. [T.he]...", "Pose", null)  as text)

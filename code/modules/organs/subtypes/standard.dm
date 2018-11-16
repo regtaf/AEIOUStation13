@@ -23,10 +23,11 @@
 	organ_rel_size = 70
 	base_miss_chance = 10
 
-/obj/item/organ/external/chest/robotize(var/company, var/skip_prosthetics = 0, var/keep_organs = 0)
+/obj/item/organ/external/chest/robotize()
 	if(..() && robotic != ORGAN_NANOFORM) //VOREStation Edit
-		// Give them a new cell.
-		owner.internal_organs_by_name["cell"] = new /obj/item/organ/internal/cell(owner,1)
+		// Give them fancy new organs.
+		owner.internal_organs_by_name[O_CELL] = new /obj/item/organ/internal/cell(owner,1)
+		owner.internal_organs_by_name[O_VOICE] = new /obj/item/organ/internal/voicebox/robot(owner, 1)
 
 /obj/item/organ/external/chest/handle_germ_effects()
 	. = ..() //Should return an infection level
@@ -264,8 +265,51 @@
 	var/eye_icon = "eyes_s"
 	force = 3
 	throwforce = 7
-
 	var/eye_icon_location = 'icons/mob/human_face.dmi'
+
+	var/has_lips = 1
+
+	var/forehead_graffiti
+	var/graffiti_style
+
+/obj/item/organ/external/head/examine(mob/user)
+	. = ..()
+
+	if(forehead_graffiti && graffiti_style)
+		to_chat(user, "<span class='notice'>It has \"[forehead_graffiti]\" written on it in [graffiti_style]!</span>")
+
+/obj/item/organ/external/head/proc/write_on(var/mob/penman, var/style)
+	var/head_name = name
+	var/atom/target = src
+	if(owner)
+		head_name = "[owner]'s [name]"
+		target = owner
+
+	if(forehead_graffiti)
+		to_chat(penman, "<span class='notice'>There is no room left to write on [head_name]!</span>")
+		return
+
+	var/graffiti = sanitizeSafe(input(penman, "Enter a message to write on [head_name]:") as text|null, MAX_NAME_LEN)
+	if(graffiti)
+		if(!target.Adjacent(penman))
+			to_chat(penman, "<span class='notice'>[head_name] is too far away.</span>")
+			return
+
+		if(owner && owner.check_head_coverage())
+			to_chat(penman, "<span class='notice'>[head_name] is covered up.</span>")
+			return
+
+		penman.visible_message("<span class='warning'>[penman] begins writing something on [head_name]!</span>", "You begin writing something on [head_name].")
+
+		if(do_after(penman, 3 SECONDS, target))
+			if(owner && owner.check_head_coverage())
+				to_chat(penman, "<span class='notice'>[head_name] is covered up.</span>")
+				return
+
+			penman.visible_message("<span class='warning'>[penman] writes something on [head_name]!</span>", "You write something on [head_name].")
+			forehead_graffiti = graffiti
+			graffiti_style = style
+
 
 /obj/item/organ/external/head/robotize(var/company, var/skip_prosthetics, var/keep_organs)
 	return ..(company, skip_prosthetics, 1)

@@ -42,12 +42,15 @@ var/const/standard_monitor_styles = "blank=ipc_blank;\
 	var/lifelike										 // If set, appears organic.
 	var/skin_tone										 // If set, applies skin tone rather than part color
 	var/blood_color = "#030303"
-	var/list/species_cannot_use = list(SPECIES_TESHARI, "Promethean") //VOREStation Add
+	var/list/species_cannot_use = list("Promethean") //AEIOU edit: Teshari have prosthetics now, prometheans do not
 	var/list/monitor_styles			 		 			 //If empty, the model of limbs offers a head compatible with monitors.
 	var/parts = BP_ALL						 			 //Defines what parts said brand can replace on a body.
 	var/health_hud_intensity = 1						 // Intensity modifier for the health GUI indicator.
 	var/suggested_species = "Human"						 //If it should make the torso a species
 	var/speech_bubble_appearance = "synthetic"			 // What icon_state to use for speech bubbles when talking.  Check talk.dmi for all the icons.
+
+	var/robo_brute_mod = 1								 // Multiplier for incoming brute damage.
+	var/robo_burn_mod = 1								 // As above for burn.
 
 /datum/robolimb/unbranded_monitor
 	company = "Unbranded Monitor"
@@ -57,10 +60,34 @@ var/const/standard_monitor_styles = "blank=ipc_blank;\
 	monitor_styles = standard_monitor_styles
 	unavailable_to_build = 1
 
+/datum/robolimb/unbranded_alt1
+	company = "Unbranded - Protez"
+	desc = "A simple robotic limb with retro design. Seems rather stiff."
+	icon = 'icons/mob/human_races/cyberlimbs/unbranded/unbranded_alt1.dmi'
+	unavailable_to_build = 1
+
+/datum/robolimb/unbranded_alt2
+	company = "Unbranded - Mantis Prosis"
+	desc = "This limb has a casing of sleek black metal and repulsive insectile design."
+	icon = 'icons/mob/human_races/cyberlimbs/unbranded/unbranded_alt2.dmi'
+	unavailable_to_build = 1
+
 /datum/robolimb/nanotrasen
 	company = "NanoTrasen"
 	desc = "A simple but efficient robotic limb, created by NanoTrasen."
 	icon = 'icons/mob/human_races/cyberlimbs/nanotrasen/nanotrasen_main.dmi'
+
+/datum/robolimb/nestortesh
+	company = "NS-Tech - Raven"
+	desc = "This prosthetic limb is covered in thin layer of synthflesh with feather-shaped formations."
+	icon = 'icons/mob/human_races/cyberlimbs/nestortesh/nanotrasen_main.dmi'
+
+
+/datum/robolimb/nestortesh_alt1
+	company = "NS-Tech - Swan"
+	desc = "This prosthetic limb is covered in thin layer of synthflesh with feather-shaped formations."
+	icon = 'icons/mob/human_races/cyberlimbs/nestortesh/white.dmi'
+
 
 /datum/robolimb/bishop
 	company = "Bishop"
@@ -202,6 +229,8 @@ var/const/standard_monitor_styles = "blank=ipc_blank;\
 	skin_tone = 1
 	blood_color = "#CCCCCC"
 	speech_bubble_appearance = "normal"
+	//robo_brute_mod = 1.1 //VOREStation Edit
+	//robo_burn_mod = 1.1 //VOREStation Edit
 
 /datum/robolimb/wardtakahashi
 	company = "Ward-Takahashi"

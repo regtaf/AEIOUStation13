@@ -81,6 +81,7 @@
 	desc = "The NT Mk58 is a cheap, ubiquitous sidearm, produced by a NanoTrasen subsidiary. Found pretty much everywhere humans are. Uses .45 rounds."
 	icon_state = "secguncomp"
 	magazine_type = /obj/item/ammo_magazine/m45/rubber
+	allowed_magazines = list(/obj/item/ammo_magazine/m45)
 	projectile_type = /obj/item/projectile/bullet/pistol/medium
 	caliber = ".45"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
@@ -257,7 +258,7 @@
 
 /obj/item/weapon/gun/projectile/pirate
 	name = "zip gun"
-	desc = "Little more than a barrel, handle, and firing mechanism, cheap makeshift firearms like this one are not uncommon in frontier systems."
+	desc = "Little more than a barrel, handle, and firing mechanism, cheap makeshift firearms like this one are not uncommon in frontier systems.Uses..basically any bullet."
 	icon_state = "sawnshotgun"
 	item_state = "sawnshotgun"
 	handle_casings = CYCLE_CASINGS //player has to take the old casing out manually before reloading
@@ -266,8 +267,8 @@
 
 	var/global/list/ammo_types = list(
 		/obj/item/ammo_casing/a357              = ".357",
-		/obj/item/ammo_casing/a9mmf             = "9mm",
-		/obj/item/ammo_casing/a45f              = ".45",
+		/obj/item/ammo_casing/a9mm		        = "9mm",
+		/obj/item/ammo_casing/a45				= ".45",
 		/obj/item/ammo_casing/a10mm             = "10mm",
 		/obj/item/ammo_casing/a12g              = "12g",
 		/obj/item/ammo_casing/a12g              = "12g",
@@ -301,6 +302,12 @@
 	max_shells = 2
 	ammo_type = /obj/item/ammo_casing/a357
 	projectile_type = /obj/item/projectile/bullet/pistol/strong
+
+
+	firemodes = list(
+		list(mode_name="Quick", burst=1, fire_delay=0, burst_accuracy = list(-4.0), dispersion = list(-4.0)),
+		list(mode_name="Aimed", burst=1, burst_delay=2, fire_delay=4, move_delay=4),
+		)
 
 /obj/item/weapon/gun/projectile/luger
 	name = "\improper P08 Luger"

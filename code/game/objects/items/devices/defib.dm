@@ -32,8 +32,8 @@
 
 /obj/item/device/defib_kit/Destroy()
 	. = ..()
-	qdel_null(paddles)
-	qdel_null(bcell)
+	QDEL_NULL(paddles)
+	QDEL_NULL(bcell)
 
 /obj/item/device/defib_kit/loaded //starts with a cell
 	bcell = /obj/item/weapon/cell/apc
@@ -94,7 +94,7 @@
 			to_chat(user, "<span class='notice'>You install a cell in \the [src].</span>")
 			update_icon()
 
-	else if(isscrewdriver(W))
+	else if(W.is_screwdriver())
 		if(bcell)
 			bcell.update_icon()
 			bcell.forceMove(get_turf(src.loc))
@@ -285,11 +285,7 @@
 
 	H.updatehealth()
 
-	if(H.isSynthetic())
-		if(H.health + H.getOxyLoss() + H.getToxLoss() <= config.health_threshold_dead)
-			return "buzzes, \"Resuscitation failed - Severe damage detected. Begin manual repair before further attempts futile.\""
-
-	else if(H.health + H.getOxyLoss() <= config.health_threshold_dead || (HUSK in H.mutations) || !H.can_defib)
+	if(H.health + H.getOxyLoss() <= config.health_threshold_dead || (HUSK in H.mutations) || (!H.isSynthetic() && !H.can_defib))
 		return "buzzes, \"Resuscitation failed - Severe tissue damage makes recovery of patient impossible via defibrillator. Further attempts futile.\""
 
 	var/bad_vital_organ = check_vital_organs(H)
@@ -428,8 +424,6 @@
 	var/adjust_health = barely_in_crit - H.health //need to increase health by this much
 	H.adjustOxyLoss(-adjust_health)
 
-	if(H.isSynthetic())
-		H.adjustToxLoss(-H.getToxLoss())
 
 	make_announcement("pings, \"Resuscitation successful.\"", "notice")
 	playsound(get_turf(src), 'sound/machines/defib_success.ogg', 50, 0)

@@ -33,6 +33,15 @@
 	item_state = "quill"
 	throwforce = 5
 
+/obj/item/weapon/arrow/baguette
+	name = "stale baguette"
+	desc = "A very hard stale baguette."
+	icon = 'icons/obj/food.dmi'
+	icon_state = "baguette"
+	item_state = "baguette"
+	throwforce = 5
+
+
 /obj/item/weapon/arrow/rod
 	name = "metal rod"
 	desc = "Don't cry for me, Orithena."
@@ -162,7 +171,7 @@
 		else
 			user << "<span class='notice'>[src] already has a cell installed.</span>"
 
-	else if(istype(W, /obj/item/weapon/screwdriver))
+	else if(W.is_screwdriver())
 		if(cell)
 			var/obj/item/C = cell
 			C.loc = get_turf(user)
@@ -227,7 +236,7 @@
 			else
 				user << "<span class='notice'>You need at least three rods to complete this task.</span>"
 			return
-	else if(istype(W,/obj/item/weapon/weldingtool))
+	else if(istype(W, /obj/item/weapon/weldingtool))
 		if(buildstate == 1)
 			var/obj/item/weapon/weldingtool/T = W
 			if(T.remove_fuel(0,user))
@@ -237,7 +246,7 @@
 			buildstate++
 			update_icon()
 		return
-	else if(istype(W,/obj/item/stack/cable_coil))
+	else if(istype(W, /obj/item/stack/cable_coil))
 		var/obj/item/stack/cable_coil/C = W
 		if(buildstate == 2)
 			if(C.use(5))
@@ -265,7 +274,7 @@
 			else
 				user << "<span class='notice'>You need at least three plastic sheets to complete this task.</span>"
 			return
-	else if(istype(W,/obj/item/weapon/screwdriver))
+	else if(W.is_screwdriver())
 		if(buildstate == 5)
 			user << "<span class='notice'>You secure the crossbow's various parts.</span>"
 			playsound(src, W.usesound, 50, 1)

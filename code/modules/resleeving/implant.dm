@@ -10,12 +10,12 @@
 	icon = 'icons/vore/custom_items_vr.dmi'
 	icon_state = "backup_implant"
 
-/obj/item/weapon/implant/backup/get_data()
+/obj/item/weapon/implant/backup/get_data()	//AEIOU edit - no more KHI
 	var/dat = {"
 <b>Implant Specifications:</b><BR>
 <b>Name:</b> [using_map.company_name] Employee Backup Implant<BR>
 <b>Life:</b> ~8 hours.<BR>
-<b>Important Notes:</b> Implant is life-limited due to KHI licensing restrictions. Dissolves into harmless biomaterial after around ~8 hours, the typical work shift.<BR>
+<b>Important Notes:</b> Implant is life-limited due to restrictions outlined within Nanotrasen's Employment Contract. Dissolves into harmless biomaterial after around ~8 hours, the typical work shift.<BR>
 <HR>
 <b>Implant Details:</b><BR>
 <b>Function:</b> Contains a small swarm of nanobots that perform neuron scanning to create mind-backups.<BR>
@@ -27,13 +27,9 @@
 	SStranscore.implants -= src
 	return ..()
 
-/obj/item/weapon/implant/backup/implanted(var/mob/living/carbon/human/H)
-	..()
+/obj/item/weapon/implant/backup/post_implant(var/mob/living/carbon/human/H)
 	if(istype(H))
-		var/obj/item/weapon/implant/backup/other_imp = locate(/obj/item/weapon/implant/backup,H)
-		if(other_imp && other_imp.imp_in == H)
-			qdel(other_imp) //implant fight
-
+		BITSET(H.hud_updateflag, BACKUP_HUD)
 		SStranscore.implants |= src
 
 		return 1
@@ -107,18 +103,10 @@
 				M.visible_message("<span class='notice'>[M] has been backup implanted by [user].</span>")
 
 				var/obj/item/weapon/implant/backup/imp = imps[imps.len]
-				if(imp.implanted(M))
-					imp.forceMove(M)
+				if(imp.handle_implant(M,user.zone_sel.selecting))
+					imp.post_implant(M)
 					imps -= imp
-					imp.imp_in = M
-					imp.implanted = 1
 					add_attack_logs(user,M,"Implanted backup implant")
-					if (ishuman(M))
-						var/mob/living/carbon/human/H = M
-						var/obj/item/organ/external/affected = H.get_organ(user.zone_sel.selecting)
-						affected.implants += imp
-						imp.part = affected
-						BITSET(H.hud_updateflag, BACKUP_HUD)
 
 				update()
 
@@ -148,5 +136,5 @@
 
 //Purely for fluff
 /obj/item/weapon/implant/backup/full
-	name = "khi backup implant"
-	desc = "A normal KHI wireless cortical stack with neutrino and QE transmission for constant-stream consciousness upload."
+	name = "advanced backup implant"
+	desc = "An advanced wireless cortical stack with neutrino and QE transmission for constant-stream consciousness upload."

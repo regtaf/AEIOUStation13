@@ -1,15 +1,60 @@
 /obj/item/weapon/reagent_containers/food/drinks/cans
 	volume = 40 //just over one and a half cups
 	amount_per_transfer_from_this = 5
-	flags = 0 //starts closed
+//	flags = 0 //starts closed
+	flags = !OPENCONTAINER
 
 //DRINKS
+
+
+
+/*
+/obj/item/weapon/reagent_containers/food/drinks/cans/attack(mob/M, mob/user)
+	if(user.a_intent == I_HURT && user.zone_sel.selecting != BP_HEAD)
+//	if(M == user && !src.reagents.total_volume && user.a_intent == INTENT_HARM && user.zone_selected == "head")
+		user.visible_message("<span class='warning'>[user] crushes the can of [src] on [user] their forehead!</span>", "<span class='notice'>You crush the can of [src] on your forehead.</span>")
+		playsound(user.loc,'sound/weapons/pierce.ogg', rand(10,50), 1)
+		var/obj/item/trash/can/crushed_can = new /obj/item/trash/can(user.loc)
+		crushed_can.icon_state = icon_state
+		qdel(src)
+	..()
+*/
+
+/obj/item/weapon/reagent_containers/food/drinks/cans/attack_self(mob/user)
+	if(!is_open_container())
+		open(user)
+		return 1
+	if(reagents.total_volume>0)
+		user << "<span class='notice'>There is still some liquid left in the [src]!</span>"
+		return 1
+
+	else
+		user.visible_message("[user] crushes the can of [src].", "You crush the can of [src].")
+		playsound(user.loc,'sound/weapons/pierce.ogg', rand(10,50), 1)
+		var/obj/item/trash/can/crushed_can = new /obj/item/trash/can(user.loc)
+		crushed_can.icon_state = icon_state
+		qdel(src)
+
+
 
 /obj/item/weapon/reagent_containers/food/drinks/cans/cola
 	name = "\improper Space Cola"
 	desc = "Cola. in space."
 	icon_state = "cola"
 	center_of_mass = list("x"=16, "y"=10)
+
+/*
+/obj/item/weapon/reagent_containers/food/drinks/cans/cola/attack_self(mob/living/user as mob)
+	if(user.a_intent == I_HURT && volume = 0
+		if(icon_state == "scrap")
+			user.show_message("<span class='warning'>\The [src] is already crumpled.</span>")
+			return
+		//crumple dat paper
+		info = stars(info,85)
+		user.visible_message("\The [user] crumples \the [src] into a ball!")
+		icon_state = "scrap"
+		return
+*/
 
 /obj/item/weapon/reagent_containers/food/drinks/cans/cola/New()
 	..()

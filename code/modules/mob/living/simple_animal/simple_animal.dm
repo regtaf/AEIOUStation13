@@ -75,6 +75,12 @@
 	var/recruit_cmd_str = "Hey,"	// The thing you prefix commands with when bossing them around
 	var/intelligence_level = SA_ANIMAL// How 'smart' the mob is ICly, used to deliniate between animal, robot, and humanoid SAs.
 
+//AEIOU EDIT START
+	var/leather_amount = 1													// How much ~~meat~~ LEATHER to drop from this mob when butchered
+	var/obj/leather_type = /obj/item/stack/material/animalhide				// The ~~meat~~ LEATHER object to drop
+//AEIOU EDIT END
+
+
 	//Mob environment settings
 	var/minbodytemp = 250			// Minimum "okay" temperature in kelvin
 	var/maxbodytemp = 350			// Maximum of above
@@ -393,7 +399,7 @@
 		//Resisting out of closets
 		if(istype(loc,/obj/structure/closet))
 			var/obj/structure/closet/C = loc
-			if(C.welded)
+			if(C.sealed)
 				handle_resist()
 			else
 				C.open()
@@ -678,6 +684,7 @@
 	if(meat_type && (stat == DEAD))	//if the animal has a meat, and if it is dead.
 		if(istype(O, /obj/item/weapon/material/knife) || istype(O, /obj/item/weapon/material/knife/butch))
 			harvest(user)
+
 	else
 		ai_log("attackby() I was weapon'd by: [user]",2)
 		if(O.force)
@@ -686,7 +693,6 @@
 	return ..()
 
 /mob/living/simple_animal/hit_with_weapon(obj/item/O, mob/living/user, var/effective_force, var/hit_zone)
-	effective_force = O.force
 
 	//Animals can't be stunned(?)
 	if(O.damtype == HALLOSS)
@@ -756,6 +762,7 @@
 /mob/living/simple_animal/death(gibbed, deathmessage = "dies!")
 	density = 0 //We don't block even if we did before
 	walk(src, 0) //We stop any background-processing walks
+	resting = 0 //We can rest in peace later.
 
 	if(faction_friends.len)
 		faction_friends -= src
@@ -824,7 +831,15 @@
 // Harvest an animal's delicious byproducts
 /mob/living/simple_animal/proc/harvest(var/mob/user)
 	var/actual_meat_amount = max(1,(meat_amount/2))
-	if(meat_type && actual_meat_amount>0 && (stat == DEAD))
+	var/actual_leather_amount = max(1,(leather_amount/2))//AEIOU
+	if(leather_type && actual_leather_amount>0 && (stat == DEAD))//Put first so it doesn't gib it.
+		for(var/i=0;i<actual_leather_amount;i++)
+			var/obj/item/leather = new leather_type(get_turf(src))
+			leather.name = "[src.name] [leather.name]"
+		if(issmall(src))
+			user.visible_message("<span class='danger'>[user] gathers leather from \the [src]!</span>")
+
+	if(meat_type && actual_meat_amount>0 && (stat == DEAD))//unedited just moved
 		for(var/i=0;i<actual_meat_amount;i++)
 			var/obj/item/meat = new meat_type(get_turf(src))
 			meat.name = "[src.name] [meat.name]"
@@ -913,6 +928,8 @@
 			if(L.faction == src.faction && !attack_same)
 				continue
 			else if(L in friends)
+				continue
+			else if(L.alpha <= EFFECTIVE_INVIS)
 				continue
 			else if(!SA_attackable(L))
 				continue
@@ -1226,7 +1243,7 @@
 	if(astarpathing) ForgetPath()
 	ai_log("GoHome()",1)
 	var/close_enough = 2
-	var/look_in = 250
+	var/look_in = 50
 	if(GetPath(home_turf,close_enough,look_in))
 		stop_automated_movement = 1
 		spawn(1)
@@ -1241,7 +1258,7 @@
 		ai_log("AttackTarget() Bailing because we're disabled",2)
 		LoseTarget()
 		return 0
-	if(!target_mob || !SA_attackable(target_mob))
+	if(!target_mob || !SA_attackable(target_mob) || (target_mob.alpha <= EFFECTIVE_INVIS)) //if the target went invisible, you can't follow it
 		LoseTarget()
 		return 0
 	if(!(target_mob in ListTargets(view_range)))
@@ -1386,6 +1403,8 @@
 //	if (!istype(target, /turf))
 //		qdel(A)
 //		return
+
+	A.firer = src
 	A.launch(target)
 	return
 

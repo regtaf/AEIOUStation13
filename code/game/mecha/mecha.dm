@@ -24,6 +24,7 @@
 	var/dir_in = 2//What direction will the mech face when entered/powered on? Defaults to South.
 	var/step_energy_drain = 10
 	var/health = 300 //health is health
+	var/maxhealth = 300 //maxhealth is maxhealth.
 	var/deflect_chance = 10 //chance to deflect the incoming projectiles, hits, or lesser the effect of ex_act.
 	//the values in this list show how much damage will pass through, not how much will be absorbed.
 	var/list/damage_absorption = list("brute"=0.8,"fire"=1.2,"bullet"=0.9,"laser"=1,"energy"=1,"bomb"=1)
@@ -39,6 +40,13 @@
 	var/lights = 0
 	var/lights_power = 6
 	var/force = 0
+
+
+
+	//strafing and actions - AEIOU edit Or addition
+	var/strafe = FALSE
+	var/defence_mode = 0
+	var/leg_overload_mode = 0
 
 	//inner atmos
 	var/use_internal_tank = 0
@@ -66,8 +74,38 @@
 
 	var/list/equipment = new
 	var/obj/item/mecha_parts/mecha_equipment/selected
-	var/max_equip = 3
+	var/max_equip = 2
 	var/datum/events/events
+//mechaequipt2 stuffs
+	var/list/hull_equipment = new
+	var/list/weapon_equipment = new
+	var/list/utility_equipment = new
+	var/list/universal_equipment = new
+	var/list/special_equipment = new
+	var/max_hull_equip = 2
+	var/max_weapon_equip = 2
+	var/max_utility_equip = 2
+	var/max_universal_equip = 2
+	var/max_special_equip = 1
+//Working exosuit vars
+	var/list/cargo = list()
+	var/cargo_capacity = 3
+//Action datums aeiou edit
+	var/datum/action/innate/mecha/mech_eject/eject_action = new
+	var/datum/action/innate/mecha/mech_toggle_internals/internals_action = new
+	var/datum/action/innate/mecha/mech_cycle_equip/cycle_action = new
+	var/datum/action/innate/mecha/mech_toggle_lights/lights_action = new
+	var/datum/action/innate/mecha/mech_view_stats/stats_action = new
+//	var/datum/action/innate/mecha/mech_toggle_thrusters/thrusters_action = new
+	var/datum/action/innate/mecha/mech_defence_mode/defense_action = new
+	var/datum/action/innate/mecha/mech_overload_mode/overload_action = new
+/*	var/datum/action/innate/mecha/mech_smoke/smoke_action = new
+	var/datum/action/innate/mecha/mech_zoom/zoom_action = new
+	var/datum/action/innate/mecha/mech_switch_damtype/switch_damtype_action = new
+	var/datum/action/innate/mecha/mech_toggle_phasing/phasing_action = new */
+	var/datum/action/innate/mecha/strafe/strafing_action = new
+
+
 
 /obj/mecha/drain_power(var/drain_check)
 
@@ -99,10 +137,24 @@
 	mechas_list += src //global mech list
 	return
 
+/obj/mecha/Exit(atom/movable/O)
+	if(O in cargo)
+		return 0
+	return ..()
+
 /obj/mecha/Destroy()
 	src.go_out()
-	for(var/mob/M in src) //Let's just be ultra sure
-		M.Move(loc)
+	for(var/mob/M in src) //Be Extra Sure
+		M.forceMove(get_turf(src))
+		M.loc.Entered(M)
+		if(M != src.occupant)
+			step_rand(M)
+	for(var/atom/movable/A in src.cargo)
+		A.forceMove(get_turf(src))
+		var/turf/T = get_turf(A)
+		if(T)
+			T.Entered(A)
+		step_rand(A)
 
 	if(loc)
 		loc.Exited(src)
@@ -112,6 +164,11 @@
 
 	if(wreckage)
 		var/obj/effect/decal/mecha_wreckage/WR = new wreckage(loc)
+		hull_equipment.Cut()
+		weapon_equipment.Cut()
+		utility_equipment.Cut()
+		universal_equipment.Cut()
+		special_equipment.Cut()
 		for(var/obj/item/mecha_parts/mecha_equipment/E in equipment)
 			if(E.salvageable && prob(30))
 				WR.crowbar_salvage += E
@@ -139,11 +196,11 @@
 	cell = null
 	internal_tank = null
 
-	qdel_null(pr_int_temp_processor)
-	qdel_null(pr_inertial_movement)
-	qdel_null(pr_give_air)
-	qdel_null(pr_internal_damage)
-	qdel_null(spark_system)
+	QDEL_NULL(pr_int_temp_processor)
+	QDEL_NULL(pr_inertial_movement)
+	QDEL_NULL(pr_give_air)
+	QDEL_NULL(pr_internal_damage)
+	QDEL_NULL(spark_system)
 
 	mechas_list -= src //global mech list
 	. = ..()
@@ -330,6 +387,15 @@
 /obj/mecha/proc/range_action(atom/target)
 	return
 
+////////////////////////////////////////
+////////  AEIOU EDIT DUD PROCS  ////////
+////////////////////////////////////////
+
+/obj/mecha/proc/defence_mode()
+	return
+
+/obj/mecha/proc/leg_overload()
+	return
 
 //////////////////////////////////
 ////////  Movement procs  ////////
@@ -360,6 +426,7 @@
 	return domove(direction)
 
 /obj/mecha/proc/domove(direction)
+
 	return call((proc_res["dyndomove"]||src), "dyndomove")(direction)
 
 /obj/mecha/proc/dyndomove(direction)
@@ -372,7 +439,7 @@
 	var/move_result = 0
 	if(hasInternalDamage(MECHA_INT_CONTROL_LOST))
 		move_result = mechsteprand()
-	else if(src.dir!=direction)
+	else if(src.dir!=direction && !strafe)
 		move_result = mechturn(direction)
 	else
 		move_result	= mechstep(direction)
@@ -388,15 +455,25 @@
 		return 1
 	return 0
 
+/obj/mecha/proc/handle_equipment_movement()
+	for(var/obj/item/mecha_parts/mecha_equipment/ME in equipment)
+		if(ME.chassis == src) //Sanity
+			ME.handle_movement_action()
+	return
+
 /obj/mecha/proc/mechturn(direction)
 	set_dir(direction)
 	playsound(src,'sound/mecha/mechturn.ogg',40,1)
 	return 1
 
 /obj/mecha/proc/mechstep(direction)
+	var/current_dir = dir
 	var/result = step(src,direction)
+	if(strafe)
+		set_dir(current_dir)
 	if(result)
 		playsound(src,"mechstep",40,1)
+		handle_equipment_movement()
 	return result
 
 
@@ -404,6 +481,7 @@
 	var/result = step_rand(src)
 	if(result)
 		playsound(src,"mechstep",40,1)
+		handle_equipment_movement()
 	return result
 
 /obj/mecha/Bump(var/atom/obstacle)
@@ -719,7 +797,7 @@
 				user << "<span class='warning'>Invalid ID: Access denied.</span>"
 		else
 			user << "<span class='warning'>Maintenance protocols disabled by operator.</span>"
-	else if(istype(W, /obj/item/weapon/wrench))
+	else if(W.is_wrench())
 		if(state==1)
 			state = 2
 			user << "You undo the securing bolts."
@@ -727,7 +805,7 @@
 			state = 1
 			user << "You tighten the securing bolts."
 		return
-	else if(istype(W, /obj/item/weapon/crowbar))
+	else if(W.is_crowbar())
 		if(state==2)
 			state = 3
 			user << "You open the hatch to the power unit"
@@ -744,7 +822,7 @@
 			else
 				user << "There's not enough wire to finish the task."
 		return
-	else if(istype(W, /obj/item/weapon/screwdriver))
+	else if(W.is_screwdriver())
 		if(hasInternalDamage(MECHA_INT_TEMP_CONTROL))
 			clearInternalDamage(MECHA_INT_TEMP_CONTROL)
 			user << "You repair the damaged temperature controller."
@@ -1109,6 +1187,8 @@
 	if(enter_after(40,usr))
 		if(!src.occupant)
 			moved_inside(usr)
+			if(ishuman(occupant))
+				GrantActions(occupant, 1)
 		else if(src.occupant!=usr)
 			to_chat(usr,"[src.occupant] was faster. Try better next time, loser.")
 	else
@@ -1175,6 +1255,7 @@
 	var/atom/movable/mob_container
 	if(ishuman(occupant))
 		mob_container = src.occupant
+		RemoveActions(occupant, human_occupant=1)
 	else if(istype(occupant, /mob/living/carbon/brain))
 		var/mob/living/carbon/brain/brain = occupant
 		mob_container = brain.container
@@ -1348,6 +1429,14 @@
 						<b>Lights: </b>[lights?"on":"off"]<br>
 						[src.dna?"<b>DNA-locked:</b><br> <span style='font-size:10px;letter-spacing:-1px;'>[src.dna]</span> \[<a href='?src=\ref[src];reset_dna=1'>Reset</a>\]<br>":null]
 					"}
+//Cargo components.
+	output += "<b>Cargo Compartment Contents:</b><div style=\"margin-left: 15px;\">"
+	if(src.cargo.len)
+		for(var/obj/O in src.cargo)
+			output += "<a href='?src=\ref[src];drop_from_cargo=\ref[O]'>Unload</a> : [O]<br>"
+	else
+		output += "Nothing"
+	output += "</div>"
 	return output
 
 /obj/mecha/proc/get_commands()
@@ -1396,10 +1485,23 @@
 		output += {"<div class='wr'>
 						<div class='header'>Equipment</div>
 						<div class='links'>"}
-		for(var/obj/item/mecha_parts/mecha_equipment/W in equipment)
-			output += "[W.name] <a href='?src=\ref[W];detach=1'>Detach</a><br>"
-		output += "<b>Available equipment slots:</b> [max_equip-equipment.len]"
-		output += "</div></div>"
+		for(var/obj/item/mecha_parts/mecha_equipment/W in hull_equipment)
+			output += "Hull Module: [W.name] <a href='?src=\ref[W];detach=1'>Detach</a><br>"
+		for(var/obj/item/mecha_parts/mecha_equipment/W in weapon_equipment)
+			output += "Weapon Module: [W.name] <a href='?src=\ref[W];detach=1'>Detach</a><br>"
+		for(var/obj/item/mecha_parts/mecha_equipment/W in utility_equipment)
+			output += "Utility Module: [W.name] <a href='?src=\ref[W];detach=1'>Detach</a><br>"
+		for(var/obj/item/mecha_parts/mecha_equipment/W in universal_equipment)
+			output += "Universal Module: [W.name] <a href='?src=\ref[W];detach=1'>Detach</a><br>"
+		for(var/obj/item/mecha_parts/mecha_equipment/W in special_equipment)
+			output += "Special Module: [W.name] <a href='?src=\ref[W];detach=1'>Detach</a><br>"
+		output += {"<b>Available hull slots:</b> [max_hull_equip-hull_equipment.len]<br>
+		 <b>Available weapon slots:</b> [max_weapon_equip-weapon_equipment.len]<br>
+		 <b>Available utility slots:</b> [max_utility_equip-utility_equipment.len]<br>
+		 <b>Available universal slots:</b> [max_universal_equip-universal_equipment.len]<br>
+		 <b>Available special slots:</b> [max_special_equip-special_equipment.len]<br>
+		 </div></div>
+		 "}
 	return output
 
 /obj/mecha/proc/get_equipment_list() //outputs mecha equipment list in html
@@ -1673,6 +1775,17 @@
 			else
 				src.occupant_message("<font color='red'>Recalibration failed.</font>")
 				src.log_message("Recalibration of coordination system failed with 1 error.",1)
+	if(href_list["drop_from_cargo"])
+		var/obj/O = locate(href_list["drop_from_cargo"])
+		if(O && O in src.cargo)
+			src.occupant_message("<span class='notice'>You unload [O].</span>")
+			O.forceMove(get_turf(src))
+			src.cargo -= O
+			var/turf/T = get_turf(O)
+			if(T)
+				T.Entered(O)
+			src.log_message("Unloaded [O]. Cargo compartment capacity: [cargo_capacity - src.cargo.len]")
+	return
 
 	//debug
 	/*
@@ -1810,81 +1923,366 @@
 /datum/global_iterator/mecha_tank_give_air
 	delay = 15
 
-	process(var/obj/mecha/mecha)
-		if(mecha.internal_tank)
-			var/datum/gas_mixture/tank_air = mecha.internal_tank.return_air()
-			var/datum/gas_mixture/cabin_air = mecha.cabin_air
+/datum/global_iterator/mecha_tank_give_air/process(var/obj/mecha/mecha)
+	if(mecha.internal_tank)
+		var/datum/gas_mixture/tank_air = mecha.internal_tank.return_air()
+		var/datum/gas_mixture/cabin_air = mecha.cabin_air
 
-			var/release_pressure = mecha.internal_tank_valve
-			var/cabin_pressure = cabin_air.return_pressure()
-			var/pressure_delta = min(release_pressure - cabin_pressure, (tank_air.return_pressure() - cabin_pressure)/2)
-			var/transfer_moles = 0
-			if(pressure_delta > 0) //cabin pressure lower than release pressure
-				if(tank_air.temperature > 0)
-					transfer_moles = pressure_delta*cabin_air.volume/(cabin_air.temperature * R_IDEAL_GAS_EQUATION)
-					var/datum/gas_mixture/removed = tank_air.remove(transfer_moles)
-					cabin_air.merge(removed)
-			else if(pressure_delta < 0) //cabin pressure higher than release pressure
-				var/datum/gas_mixture/t_air = mecha.get_turf_air()
-				pressure_delta = cabin_pressure - release_pressure
+		var/release_pressure = mecha.internal_tank_valve
+		var/cabin_pressure = cabin_air.return_pressure()
+		var/pressure_delta = min(release_pressure - cabin_pressure, (tank_air.return_pressure() - cabin_pressure)/2)
+		var/transfer_moles = 0
+		if(pressure_delta > 0) //cabin pressure lower than release pressure
+			if(tank_air.temperature > 0)
+				transfer_moles = pressure_delta*cabin_air.volume/(cabin_air.temperature * R_IDEAL_GAS_EQUATION)
+				var/datum/gas_mixture/removed = tank_air.remove(transfer_moles)
+				cabin_air.merge(removed)
+		else if(pressure_delta < 0) //cabin pressure higher than release pressure
+			var/datum/gas_mixture/t_air = mecha.get_turf_air()
+			pressure_delta = cabin_pressure - release_pressure
+			if(t_air)
+				pressure_delta = min(cabin_pressure - t_air.return_pressure(), pressure_delta)
+			if(pressure_delta > 0) //if location pressure is lower than cabin pressure
+				transfer_moles = pressure_delta*cabin_air.volume/(cabin_air.temperature * R_IDEAL_GAS_EQUATION)
+				var/datum/gas_mixture/removed = cabin_air.remove(transfer_moles)
 				if(t_air)
-					pressure_delta = min(cabin_pressure - t_air.return_pressure(), pressure_delta)
-				if(pressure_delta > 0) //if location pressure is lower than cabin pressure
-					transfer_moles = pressure_delta*cabin_air.volume/(cabin_air.temperature * R_IDEAL_GAS_EQUATION)
-					var/datum/gas_mixture/removed = cabin_air.remove(transfer_moles)
-					if(t_air)
-						t_air.merge(removed)
-					else //just delete the cabin gas, we're in space or some shit
-						qdel(removed)
-		else
-			return stop()
-		return
+					t_air.merge(removed)
+				else //just delete the cabin gas, we're in space or some shit
+					qdel(removed)
+	else
+		return stop()
+	return
 
 /datum/global_iterator/mecha_intertial_movement //inertial movement in space
 	delay = 7
 
-	process(var/obj/mecha/mecha as obj,direction)
-		if(direction)
-			if(!step(mecha, direction)||mecha.check_for_support())
-				src.stop()
-		else
+/datum/global_iterator/mecha_intertial_movement/process(var/obj/mecha/mecha as obj,direction)
+	if(direction)
+		if(!step(mecha, direction)||mecha.check_for_support())
 			src.stop()
-		return
+		mecha.handle_equipment_movement()
+	else
+		src.stop()
+	return
 
 /datum/global_iterator/mecha_internal_damage // processing internal damage
 
-	process(var/obj/mecha/mecha)
-		if(!mecha.hasInternalDamage())
-			return stop()
-		if(mecha.hasInternalDamage(MECHA_INT_FIRE))
-			if(!mecha.hasInternalDamage(MECHA_INT_TEMP_CONTROL) && prob(5))
-				mecha.clearInternalDamage(MECHA_INT_FIRE)
-			if(mecha.internal_tank)
-				if(mecha.internal_tank.return_pressure()>mecha.internal_tank.maximum_pressure && !(mecha.hasInternalDamage(MECHA_INT_TANK_BREACH)))
-					mecha.setInternalDamage(MECHA_INT_TANK_BREACH)
-				var/datum/gas_mixture/int_tank_air = mecha.internal_tank.return_air()
-				if(int_tank_air && int_tank_air.volume>0) //heat the air_contents
-					int_tank_air.temperature = min(6000+T0C, int_tank_air.temperature+rand(10,15))
-			if(mecha.cabin_air && mecha.cabin_air.volume>0)
-				mecha.cabin_air.temperature = min(6000+T0C, mecha.cabin_air.temperature+rand(10,15))
-				if(mecha.cabin_air.temperature>mecha.max_temperature/2)
-					mecha.take_damage(4/round(mecha.max_temperature/mecha.cabin_air.temperature,0.1),"fire")
-		if(mecha.hasInternalDamage(MECHA_INT_TEMP_CONTROL)) //stop the mecha_preserve_temp loop datum
-			mecha.pr_int_temp_processor.stop()
-		if(mecha.hasInternalDamage(MECHA_INT_TANK_BREACH)) //remove some air from internal tank
-			if(mecha.internal_tank)
-				var/datum/gas_mixture/int_tank_air = mecha.internal_tank.return_air()
-				var/datum/gas_mixture/leaked_gas = int_tank_air.remove_ratio(0.10)
-				if(mecha.loc && hascall(mecha.loc,"assume_air"))
-					mecha.loc.assume_air(leaked_gas)
-				else
-					qdel(leaked_gas)
-		if(mecha.hasInternalDamage(MECHA_INT_SHORT_CIRCUIT))
-			if(mecha.get_charge())
-				mecha.spark_system.start()
-				mecha.cell.charge -= min(20,mecha.cell.charge)
-				mecha.cell.maxcharge -= min(20,mecha.cell.maxcharge)
+/datum/global_iterator/mecha_internal_damage/process(var/obj/mecha/mecha)
+	if(!mecha.hasInternalDamage())
+		return stop()
+	if(mecha.hasInternalDamage(MECHA_INT_FIRE))
+		if(!mecha.hasInternalDamage(MECHA_INT_TEMP_CONTROL) && prob(5))
+			mecha.clearInternalDamage(MECHA_INT_FIRE)
+		if(mecha.internal_tank)
+			if(mecha.internal_tank.return_pressure()>mecha.internal_tank.maximum_pressure && !(mecha.hasInternalDamage(MECHA_INT_TANK_BREACH)))
+				mecha.setInternalDamage(MECHA_INT_TANK_BREACH)
+			var/datum/gas_mixture/int_tank_air = mecha.internal_tank.return_air()
+			if(int_tank_air && int_tank_air.volume>0) //heat the air_contents
+				int_tank_air.temperature = min(6000+T0C, int_tank_air.temperature+rand(10,15))
+		if(mecha.cabin_air && mecha.cabin_air.volume>0)
+			mecha.cabin_air.temperature = min(6000+T0C, mecha.cabin_air.temperature+rand(10,15))
+			if(mecha.cabin_air.temperature>mecha.max_temperature/2)
+				mecha.take_damage(4/round(mecha.max_temperature/mecha.cabin_air.temperature,0.1),"fire")
+	if(mecha.hasInternalDamage(MECHA_INT_TEMP_CONTROL)) //stop the mecha_preserve_temp loop datum
+		mecha.pr_int_temp_processor.stop()
+	if(mecha.hasInternalDamage(MECHA_INT_TANK_BREACH)) //remove some air from internal tank
+		if(mecha.internal_tank)
+			var/datum/gas_mixture/int_tank_air = mecha.internal_tank.return_air()
+			var/datum/gas_mixture/leaked_gas = int_tank_air.remove_ratio(0.10)
+			if(mecha.loc && hascall(mecha.loc,"assume_air"))
+				mecha.loc.assume_air(leaked_gas)
+			else
+				qdel(leaked_gas)
+	if(mecha.hasInternalDamage(MECHA_INT_SHORT_CIRCUIT))
+		if(mecha.get_charge())
+			mecha.spark_system.start()
+			mecha.cell.charge -= min(20,mecha.cell.charge)
+			mecha.cell.maxcharge -= min(20,mecha.cell.maxcharge)
+	return
+
+
+
+/////AEIOU EDIT - Clickable icon addition
+
+
+/obj/mecha/proc/GrantActions(mob/living/user, human_occupant = 0)
+	if(human_occupant)
+		eject_action.Grant(user, src)
+	internals_action.Grant(user, src)
+	cycle_action.Grant(user, src)
+	lights_action.Grant(user, src)
+	stats_action.Grant(user, src)
+	strafing_action.Grant(user, src)
+
+
+/obj/mecha/proc/RemoveActions(mob/living/user, human_occupant = 0)
+	if(human_occupant)
+		eject_action.Remove(user)
+	internals_action.Remove(user)
+	cycle_action.Remove(user)
+	lights_action.Remove(user)
+	stats_action.Remove(user)
+	strafing_action.Remove(user)
+
+
+/datum/action/innate/mecha
+	check_flags = AB_CHECK_RESTRAINED | AB_CHECK_STUNNED | AB_CHECK_ALIVE
+	button_icon = 'icons/effects/actions_mecha.dmi'
+	var/obj/mecha/chassis
+
+/datum/action/innate/mecha/Grant(mob/living/L, obj/mecha/M)
+	if(M)
+		chassis = M
+	..()
+
+/datum/action/innate/mecha/Destroy()
+	chassis = null
+	return ..()
+
+/datum/action/innate/mecha/mech_eject
+	name = "Eject From Mech"
+	button_icon_state = "mech_eject"
+
+/datum/action/innate/mecha/mech_eject/Activate()
+	if(!owner)
 		return
+	if(!chassis || chassis.occupant != owner)
+		return
+	chassis.go_out()
+
+
+/datum/action/innate/mecha/mech_toggle_internals
+	name = "Toggle Internal Airtank Usage"
+	button_icon_state = "mech_internals_off"
+
+/datum/action/innate/mecha/mech_toggle_internals/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	chassis.use_internal_tank = !chassis.use_internal_tank
+	button_icon_state = "mech_internals_[chassis.use_internal_tank ? "on" : "off"]"
+	chassis.occupant_message("Now taking air from [chassis.use_internal_tank?"internal airtank":"environment"].")
+	chassis.log_message("Now taking air from [chassis.use_internal_tank?"internal airtank":"environment"].")
+	button.UpdateIcon()
+
+/datum/action/innate/mecha/mech_cycle_equip
+	name = "Cycle Equipment"
+	button_icon_state = "mech_cycle_equip_off"
+
+/datum/action/innate/mecha/mech_cycle_equip/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+
+	var/list/available_equipment = list()
+	available_equipment = chassis.equipment
+
+	if(available_equipment.len == 0)
+		chassis.occupant_message("No equipment available.")
+		return
+	if(!chassis.selected)
+		chassis.selected = available_equipment[1]
+		chassis.occupant_message("You select [chassis.selected]")
+		send_byjax(chassis.occupant,"exosuit.browser","eq_list",chassis.get_equipment_list())
+		button_icon_state = "mech_cycle_equip_on"
+		button.UpdateIcon()
+		return
+	var/number = 0
+	for(var/A in available_equipment)
+		number++
+		if(A == chassis.selected)
+			if(available_equipment.len == number)
+				chassis.selected = null
+				chassis.occupant_message("You switch to no equipment")
+				button_icon_state = "mech_cycle_equip_off"
+			else
+				chassis.selected = available_equipment[number+1]
+				chassis.occupant_message("You switch to [chassis.selected]")
+				button_icon_state = "mech_cycle_equip_on"
+			send_byjax(chassis.occupant,"exosuit.browser","eq_list",chassis.get_equipment_list())
+			button.UpdateIcon()
+			return
+
+
+/datum/action/innate/mecha/mech_toggle_lights
+	name = "Toggle Lights"
+	button_icon_state = "mech_lights_off"
+
+/datum/action/innate/mecha/mech_toggle_lights/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	chassis.lights = !chassis.lights
+	if(chassis.lights)
+		chassis.set_light(chassis.lights_power)
+		button_icon_state = "mech_lights_on"
+	else
+		chassis.set_light(-chassis.lights_power)
+		button_icon_state = "mech_lights_off"
+	chassis.occupant_message("Toggled lights [chassis.lights?"on":"off"].")
+	chassis.log_message("Toggled lights [chassis.lights?"on":"off"].")
+	button.UpdateIcon()
+
+/datum/action/innate/mecha/mech_view_stats
+	name = "View Stats"
+	button_icon_state = "mech_view_stats"
+
+/datum/action/innate/mecha/mech_view_stats/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	chassis.occupant << browse(chassis.get_stats_html(), "window=exosuit")
+
+
+/datum/action/innate/mecha/strafe
+	name = "Toggle Strafing"
+	button_icon_state = "strafe"
+
+/datum/action/innate/mecha/strafe/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	chassis.strafe = !chassis.strafe
+	chassis.occupant_message("Toggled strafing mode [chassis.strafe?"on":"off"].")
+	chassis.log_message("Toggled strafing mode [chassis.strafe?"on":"off"].")
+	button.UpdateIcon()
+
+
+/obj/mecha/proc/toggle_strafe()
+	strafe = !strafe
+
+	occupant_message("Toggled strafing mode [strafe?"on":"off"].")
+	log_message("Toggled strafing mode [strafe?"on":"off"].")
+	strafing_action.button.UpdateIcon()
+
+//////////////////////////////////////// Specific Ability Actions  ///////////////////////////////////////////////
+//Need to be granted by the mech type, Not default abilities.
+
+/datum/action/innate/mecha/mech_defence_mode
+	name = "Toggle Defence Mode"
+	button_icon_state = "mech_defense_mode_off"
+
+/datum/action/innate/mecha/mech_defence_mode/Activate(forced_state = null)
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+/*	if(!isnull(forced_state))
+		chassis.defence_mode = forced_state
+	else
+		chassis.defence_mode = !chassis.defence_mode
+
+	if(chassis.defence_mode)
+		chassis.deflect_chance = chassis.defence_mode_deflect_chance
+		chassis.occupant_message("<span class='notice'>You enable [chassis] defence mode.</span>")
+	else
+		chassis.deflect_chance = initial(chassis.deflect_chance)
+		chassis.occupant_message("<span class='danger'>You disable [chassis] defence mode.</span>")
+	chassis.log_message("Toggled defence mode.")*/
+	chassis.defence_mode()
+	if(chassis.defence_mode == 0)
+		button_icon_state = "mech_defense_mode_off"
+	else
+		button_icon_state = "mech_defense_mode_on"
+	button.UpdateIcon()
+
+/datum/action/innate/mecha/mech_overload_mode
+	name = "Toggle leg actuators overload"
+	button_icon_state = "mech_overload_off"
+
+/datum/action/innate/mecha/mech_overload_mode/Activate(forced_state = null)
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	/*if(!isnull(forced_state))
+		chassis.leg_overload_mode = forced_state
+	else
+		chassis.leg_overload_mode = !chassis.leg_overload_mode
+	button_icon_state = "mech_overload_[chassis.leg_overload_mode ? "on" : "off"]"
+	chassis.log_message("Toggled leg actuators overload.")
+	if(chassis.leg_overload_mode)
+		chassis.leg_overload_mode = 1
+		chassis.bumpsmash = 1
+		chassis.step_in = min(1, round(chassis.step_in/2))
+		chassis.step_energy_drain = max(chassis.overload_step_energy_drain_min,chassis.step_energy_drain*chassis.leg_overload_coeff)
+		chassis.occupant_message("<span class='danger'>You enable leg actuators overload.</span>")
+	else
+		chassis.leg_overload_mode = 0
+		chassis.bumpsmash = 0
+		chassis.step_in = initial(chassis.step_in)
+		chassis.step_energy_drain = chassis.normal_step_energy_drain
+		chassis.occupant_message("<span class='notice'>You disable leg actuators overload.</span>")*/
+	chassis.leg_overload()
+	button_icon_state = "mech_overload_[chassis.leg_overload_mode?"on":"off"]"
+	if(chassis.leg_overload_mode == 0)
+		button_icon_state = "mech_overload_off"
+	else
+		button_icon_state = "mech_overload_on"
+	button.UpdateIcon()
+
+/*
+/datum/action/innate/mecha/mech_smoke
+	name = "Smoke"
+	button_icon_state = "mech_smoke"
+
+/datum/action/innate/mecha/mech_smoke/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	if(chassis.smoke_ready && chassis.smoke>0)
+		chassis.smoke_system.start()
+		chassis.smoke--
+		chassis.smoke_ready = 0
+		spawn(chassis.smoke_cooldown)
+			chassis.smoke_ready = 1
+
+/*
+/datum/action/innate/mecha/mech_zoom
+	name = "Zoom"
+	button_icon_state = "mech_zoom_off"
+
+/datum/action/innate/mecha/mech_zoom/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	if(owner.client)
+		chassis.zoom_mode = !chassis.zoom_mode
+		button_icon_state = "mech_zoom_[chassis.zoom_mode ? "on" : "off"]"
+		chassis.log_message("Toggled zoom mode.")
+		chassis.occupant_message("<font color='[chassis.zoom_mode?"blue":"red"]'>Zoom mode [chassis.zoom_mode?"en":"dis"]abled.</font>")
+		if(chassis.zoom_mode)
+			owner.client.change_view(12)
+			SEND_SOUND(owner, sound('sound/mecha/imag_enh.ogg',volume=50))
+		else
+			owner.client.change_view(CONFIG_GET(string/default_view)) //world.view - default mob view size
+		button.UpdateIcon()
+*/
+/datum/action/innate/mecha/mech_switch_damtype
+	name = "Reconfigure arm microtool arrays"
+	button_icon_state = "mech_damtype_brute"
+
+/datum/action/innate/mecha/mech_switch_damtype/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	var/new_damtype
+	switch(chassis.damtype)
+		if("tox")
+			new_damtype = "brute"
+			chassis.occupant_message("Your exosuit's hands form into fists.")
+		if("brute")
+			new_damtype = "fire"
+			chassis.occupant_message("A torch tip extends from your exosuit's hand, glowing red.")
+		if("fire")
+			new_damtype = "tox"
+			chassis.occupant_message("A bone-chillingly thick plasteel needle protracts from the exosuit's palm.")
+	chassis.damtype = new_damtype
+	button_icon_state = "mech_damtype_[new_damtype]"
+	playsound(src, 'sound/mecha/mechmove01.ogg', 50, 1)
+	button.UpdateIcon()
+
+/datum/action/innate/mecha/mech_toggle_phasing
+	name = "Toggle Phasing"
+	button_icon_state = "mech_phasing_off"
+
+/datum/action/innate/mecha/mech_toggle_phasing/Activate()
+	if(!owner || !chassis || chassis.occupant != owner)
+		return
+	chassis.phasing = !chassis.phasing
+	button_icon_state = "mech_phasing_[chassis.phasing ? "on" : "off"]"
+	chassis.occupant_message("<font color=\"[chassis.phasing?"#00f\">En":"#f00\">Dis"]abled phasing.</font>")
+	button.UpdateIcon()
+*/
+
 
 
 /////////////
@@ -1923,3 +2321,6 @@
 	//src.check_for_internal_damage(list(MECHA_INT_FIRE,MECHA_INT_TEMP_CONTROL,MECHA_INT_TANK_BREACH,MECHA_INT_CONTROL_LOST))
 	return
 */
+
+
+

@@ -107,6 +107,92 @@ proc/get_radio_key_from_channel(var/channel)
 		message = stutter(message)
 		verb = pick("stammers","stutters")
 		. = 1
+/*
+	if(italian == 1)
+		message = replacetext(message,"mom","mamma")
+		message = replacetext(message,"dad","pappa")
+		message = replacetext(message,"baby",pick("bambino","little sausage roll"))
+		message = replacetext(message,"spicy","a-spicy")
+		message = replacetext(message,"I'm","I'm-a")
+		message = replacetext(message,"friend","enemy")
+		message = replacetext(message,"enemy","friend")
+		message = replacetext(message,"traitor","mafioso")
+		message = replacetext(message,"operative","greek")
+		message = replacetext(message,"op","greek")
+		message = replacetext(message,"ops","greeks")
+		message = replacetext(message,"nuke","the spiciest-a meatball")
+		message = replacetext(message,"good","molto bene")
+		message = replacetext(message,"why","for-a what reason")
+		message = replacetext(message,"my","my-a")
+		message = replacetext(message,"it's","it's-a")
+		message = replacetext(message,"bad","molto-mal")
+		message = replacetext(message,"sing","sing-a")
+		message = replacetext(message,"cook","cook-a")
+		message = replacetext(message,"want","want-a")
+		message = replacetext(message,"what's","what's-a")
+		message = replacetext(message,"what","what-a")
+		message = replacetext(message,"and","and-a")
+		message = replacetext(message,"am","am-a")
+		message = replacetext(message,"assistant","sicilian")
+		message = replacetext(message,"greytide","nafri")
+		message = replacetext(message,"captain","capitano")
+		message = replacetext(message,"sec","polizia")
+		message = replacetext(message,"security","polizia")
+		message = replacetext(message,"cheese","parmesano")
+		message = replacetext(message,"meat","pepperoni")
+		message = replacetext(message,"who's","who's-a")
+		message = replacetext(message,"who","who-a")
+		message = replacetext(message,"thing","thing-a")
+		message = replacetext(message,"whose","whose-a")
+		if(prob(10))
+			message += " Ravioli [pick(", ravioli",", ravioli, linguini")]!"
+			message += " Mamma-mia [pick("Mamma-mia!" , "Mamma-mia! That's a spicy meat-ball!")]!"
+	. = 1
+*/
+
+
+	if(italian == 1)
+		message = replacetext(message,"mom","mamma")
+		message = replacetext(message,"dad","pappa")
+		message = replacetext(message,"baby",pick("bambino","little sausage roll"))
+		message = replacetext(message,"spicy","a-spicy")
+		message = replacetext(message,"I'm","I'm-a")
+		message = replacetext(message,"friend","enemy")
+		message = replacetext(message,"enemy","friend")
+		message = replacetext(message,"traitor","mafioso")
+		message = replacetext(message,"operative","greek")
+		message = replacetext(message,"op","greek")
+		message = replacetext(message,"ops","greeks")
+		message = replacetext(message,"nuke","the spiciest-a meatball")
+		message = replacetext(message,"good","molto bene")
+		message = replacetext(message,"why","for-a what reason")
+		message = replacetext(message,"my","my-a")
+		message = replacetext(message,"it's","it's-a")
+		message = replacetext(message,"bad","molto-mal")
+		message = replacetext(message,"sing","sing-a")
+		message = replacetext(message,"cook","cook-a")
+		message = replacetext(message,"want","want-a")
+		message = replacetext(message,"what's","what's-a")
+		message = replacetext(message,"what","what-a")
+		message = replacetext(message,"and","and-a")
+		message = replacetext(message,"am","am-a")
+		message = replacetext(message,"assistant","sicilian")
+		message = replacetext(message,"greytide","nafri")
+		message = replacetext(message,"captain","capitano")
+		message = replacetext(message,"sec","polizia")
+		message = replacetext(message,"security","polizia")
+		message = replacetext(message,"cheese","parmesano")
+		message = replacetext(message,"meat","pepperoni")
+		message = replacetext(message,"who's","who's-a")
+		message = replacetext(message,"who","who-a")
+		message = replacetext(message,"thing","thing-a")
+		message = replacetext(message,"whose","whose-a")
+		if(prob(10))
+			message += " Ravioli [pick(", ravioli",", ravioli, linguini")]!"
+			message += " Mamma-mia [pick("Mamma-mia!" , "Mamma-mia! That's a spicy meat-ball!")]!"
+	. = 1
+
+
 
 	message_data[1] = message
 	message_data[2] = verb
@@ -265,13 +351,13 @@ proc/get_radio_key_from_channel(var/channel)
 
 	//Handle nonverbal and sign languages here
 	if (speaking)
-		if (speaking.flags & NONVERBAL)
-			if (prob(30))
-				src.custom_emote(1, "[pick(speaking.signlang_verb)].")
-
 		if (speaking.flags & SIGNLANG)
 			log_say("(SIGN) [message]", src)
 			return say_signlang(message, pick(speaking.signlang_verb), speaking)
+
+		if (speaking.flags & NONVERBAL)
+			if (prob(30))
+				src.custom_emote(1, "[pick(speaking.signlang_verb)].")
 
 	//These will contain the main receivers of the message
 	var/list/listening = list()
@@ -335,6 +421,7 @@ proc/get_radio_key_from_channel(var/channel)
 						images_to_clients[I1] |= M.client
 						M << I1
 					M.hear_say(message, verb, speaking, alt_name, italics, src, speech_sound, sound_vol)
+
 				if(whispering) //Don't even bother with these unless whispering
 					if(dst > message_range && dst <= w_scramble_range) //Inside whisper scramble range
 						if(M.client)
@@ -344,6 +431,13 @@ proc/get_radio_key_from_channel(var/channel)
 						M.hear_say(stars(message), verb, speaking, alt_name, italics, src, speech_sound, sound_vol*0.2)
 					if(dst > w_scramble_range && dst <= world.view) //Inside whisper 'visible' range
 						M.show_message("<span class='game say'><span class='name'>[src.name]</span> [w_not_heard].</span>", 2)
+
+				if(ishuman(src))//this helps with the voice masks with the owl_aeiou.dm file
+					var/mob/living/carbon/human/human = src
+					if(istype(human.wear_mask, /obj/item/clothing/mask/gas/owl_aeiou))
+						var/obj/item/clothing/mask/gas/owl_aeiou/owl_mask = wear_mask
+						owl_mask.play_owl_sound()
+
 
 	//Object message delivery
 	for(var/obj/O in listening_obj)
@@ -374,11 +468,19 @@ proc/get_radio_key_from_channel(var/channel)
 	return 1
 
 /mob/living/proc/say_signlang(var/message, var/verb="gestures", var/datum/language/language)
-	var/list/potentials = get_mobs_and_objs_in_view_fast(src, world.view)
-	var/list/mobs = potentials["mobs"]
-	for(var/hearer in mobs)
-		var/mob/M = hearer
-		M.hear_signlang(message, verb, language, src)
+	var/turf/T = get_turf(src)
+	//We're in something, gesture to people inside the same thing
+	if(loc != T)
+		for(var/mob/M in loc)
+			M.hear_signlang(message, verb, language, src)
+
+	//We're on a turf, gesture to visible as if we were a normal language
+	else
+		var/list/potentials = get_mobs_and_objs_in_view_fast(T, world.view)
+		var/list/mobs = potentials["mobs"]
+		for(var/hearer in mobs)
+			var/mob/M = hearer
+			M.hear_signlang(message, verb, language, src)
 	return 1
 
 /obj/effect/speech_bubble

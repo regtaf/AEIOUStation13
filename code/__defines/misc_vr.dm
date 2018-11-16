@@ -18,7 +18,12 @@
 
 //For custom species
 #define STARTING_SPECIES_POINTS 1
-#define MAX_SPECIES_TRAITS 5
+#define MAX_SPECIES_TRAITS 6
+
+// Xenochimera thing mostly
+#define REVIVING_NOW		1
+#define REVIVING_DONE		2
+#define REVIVING_COOLDOWN	3
 
 // Resleeving Mind Record Status
 #define MR_NORMAL 0
@@ -32,3 +37,12 @@
 
 //Assistant/Visitor/Whatever
 #define USELESS_JOB "Visitor"
+
+//Herm Gender
+#define HERM "herm"
+
+// Bluespace shelter deploy checks
+#define SHELTER_DEPLOY_ALLOWED "allowed"
+#define SHELTER_DEPLOY_BAD_TURFS "bad turfs"
+#define SHELTER_DEPLOY_BAD_AREA "bad area"
+#define SHELTER_DEPLOY_ANCHORED_OBJECTS "anchored objects"

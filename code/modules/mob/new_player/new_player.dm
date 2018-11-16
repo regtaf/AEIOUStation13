@@ -2,9 +2,10 @@
 
 /mob/new_player
 	var/ready = 0
-	var/spawning = 0//Referenced when you want to delete the new_player later on in the code.
-	var/totalPlayers = 0		 //Player counts for the Lobby tab
+	var/spawning = 0			//Referenced when you want to delete the new_player later on in the code.
+	var/totalPlayers = 0		//Player counts for the Lobby tab
 	var/totalPlayersReady = 0
+	var/show_hidden_jobs = 0	//Show jobs that are set to "Never" in preferences
 	var/datum/browser/panel
 	universal_speak = 1
 
@@ -27,7 +28,7 @@
 /mob/new_player/proc/new_player_panel_proc()
 	var/output = "<div align='center'>"
 	output +="<hr>"
-	output += "<p><a href='byond://?src=\ref[src];show_preferences=1'>Setup Character</A></p>"
+	output += "<p><a href='byond://?src=\ref[src];show_preferences=1'>Character Setup</A></p>"
 
 	if(!ticker || ticker.current_state <= GAME_STATE_PREGAME)
 		if(ready)
@@ -113,9 +114,9 @@
 
 	if(href_list["observe"])
 
-		if(alert(src,"Are you sure you wish to observe? You will have to wait 1 minute before being able to respawn!","Player Setup","Yes","No") == "Yes")
+		if(alert(src,"Are you sure you wish to observe? You will have to wait 5 minute before being able to respawn!","Player Setup","Yes","No") == "Yes") //Vorestation edit
 			if(!client)	return 1
-			
+
 			//Make a new mannequin quickly, and allow the observer to take the appearance
 			var/mob/living/carbon/human/dummy/mannequin = new()
 			client.prefs.dress_preview_mob(mannequin)
@@ -291,6 +292,10 @@
 		handle_server_news()
 		return
 
+	if(href_list["hidden_jobs"])
+		show_hidden_jobs = !show_hidden_jobs
+		LateChoices()
+
 /mob/new_player/proc/handle_server_news()
 	if(!client)
 		return
@@ -353,7 +358,6 @@
 	var/mob/living/character = create_character(T)	//creates the human and transfers vars and mind
 	character = job_master.EquipRank(character, rank, 1)					//equips the human
 	UpdateFactionList(character)
-	log_game("JOINED [key_name(character)] as \"[rank]\"")
 
 	// AIs don't need a spawnpoint, they must spawn at an empty core
 	if(character.mind.assigned_role == "AI")
@@ -421,10 +425,18 @@
 				dat += "<font color='red'>The station is currently undergoing crew transfer procedures.</font><br>"
 
 	dat += "Choose from the following open/valid positions:<br>"
+	dat += "<a href='byond://?src=\ref[src];hidden_jobs=1'>[show_hidden_jobs ? "Hide":"Show"] Hidden Jobs.</a><br>"
 	for(var/datum/job/job in job_master.occupations)
 		if(job && IsJobAvailable(job.title))
+			// Checks for jobs with minimum age requirements
 			if(job.minimum_character_age && (client.prefs.age < job.minimum_character_age))
 				continue
+			// Checks for jobs set to "Never" in preferences	//TODO: Figure out a better way to check for this
+			if(!(client.prefs.GetJobDepartment(job, 1) & job.flag))
+				if(!(client.prefs.GetJobDepartment(job, 2) & job.flag))
+					if(!(client.prefs.GetJobDepartment(job, 3) & job.flag))
+						if(!show_hidden_jobs && job.title != "Assistant")	// Assistant is always an option
+							continue
 			var/active = 0
 			// Only players with the job assigned and AFK for less than 10 minutes count as active
 			for(var/mob/M in player_list) if(M.mind && M.client && M.mind.assigned_role == job.title && M.client.inactivity <= 10 * 60 * 10)
@@ -470,9 +482,10 @@
 
 	if(mind)
 		mind.active = 0					//we wish to transfer the key manually
-		if(mind.assigned_role == "Clown")				//give them a clownname if they are a clown
-			new_character.real_name = pick(clown_names)	//I hate this being here of all places but unfortunately dna is based on real_name!
-			new_character.rename_self("clown")
+		// VOREStation edit to disable the destructive forced renaming for our responsible whitelist clowns.
+		//if(mind.assigned_role == "Clown")				//give them a clownname if they are a clown
+		//	new_character.real_name = pick(clown_names)	//I hate this being here of all places but unfortunately dna is based on real_name!
+		//	new_character.rename_self("clown")
 		mind.original = new_character
 		// VOREStation
 		mind.loaded_from_ckey = client.ckey

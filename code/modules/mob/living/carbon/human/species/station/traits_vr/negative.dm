@@ -101,11 +101,19 @@
 	desc = "Your bones and robot limbs are much easier to break."
 	cost = -2 //I feel like this should be higher, but let's see where it goes
 
+
 /datum/trait/hollow/apply(var/datum/species/S,var/mob/living/carbon/human/H)
 	..(S,H)
 	for(var/obj/item/organ/external/O in H.organs)
 		O.min_broken_damage *= 0.5
 		O.min_bruised_damage *= 0.5
+
+/datum/trait/haemophilia
+	name = "Haemophilia"
+	desc = "When you bleed, you bleed a LOT."
+	cost = -2
+	var_changes = list("bloodloss_rate" = 2)
+
 
 /datum/trait/lightweight
 	name = "Lightweight"
@@ -113,16 +121,14 @@
 	cost = -2
 	var_changes = list("lightweight" = 1)
 
-/datum/trait/colorblind
+/datum/trait/colorblind/mono
 	name = "Colorblindness (Monochromancy)"
 	desc = "You simply can't see colors at all, period. You are 100% colorblind."
 	cost = -1
 
-/datum/trait/colorblind/apply(var/datum/species/S,var/mob/living/carbon/human/H)
+/datum/trait/colorblind/mono/apply(var/datum/species/S,var/mob/living/carbon/human/H)
 	..(S,H)
-	if(!H.plane_holder)
-		H.plane_holder = new(H)
-	H.plane_holder.set_vis(VIS_D_COLORBLIND,TRUE) //The default is monocrhomia, no need to set values
+	H.add_modifier(/datum/modifier/trait/colorblind_monochrome)
 
 /datum/trait/colorblind/para_vulp
 	name = "Colorblindness (Para Vulp)"
@@ -131,7 +137,7 @@
 
 /datum/trait/colorblind/para_vulp/apply(var/datum/species/S,var/mob/living/carbon/human/H)
 	..(S,H)
-	H.plane_holder.alter_values(VIS_D_COLORBLIND,list("variety" = "Paradise Vulp"))
+	H.add_modifier(/datum/modifier/trait/colorblind_vulp)
 
 /datum/trait/colorblind/para_taj
 	name = "Colorblindness (Para Taj)"
@@ -140,4 +146,4 @@
 
 /datum/trait/colorblind/para_taj/apply(var/datum/species/S,var/mob/living/carbon/human/H)
 	..(S,H)
-	H.plane_holder.alter_values(VIS_D_COLORBLIND,list("variety" = "Paradise Taj"))
+	H.add_modifier(/datum/modifier/trait/colorblind_taj)

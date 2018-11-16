@@ -31,7 +31,7 @@
 	if(owner)
 		Remove(owner)
 	target = null
-	qdel_null(button)
+	QDEL_NULL(button)
 	return ..()
 
 /datum/action/proc/Grant(mob/living/T)
@@ -48,7 +48,7 @@
 	if(button)
 		if(T.client)
 			T.client.screen -= button
-		qdel_null(button)
+		QDEL_NULL(button)
 	T.actions.Remove(src)
 	T.update_action_buttons()
 	owner = null
@@ -223,3 +223,8 @@
 #undef AB_WEST_OFFSET
 #undef AB_NORTH_OFFSET
 #undef AB_MAX_COLUMNS
+
+
+
+/datum/action/innate/
+	action_type = AB_INNATE

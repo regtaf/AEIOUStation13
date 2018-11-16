@@ -291,7 +291,7 @@
 			radiation -= 4 * RADIATION_SPEED_COEFFICIENT
 
 		if(damage)
-			damage *= species.radiation_mod
+			damage *= isSynthetic() ? 0.5 : species.radiation_mod
 			adjustToxLoss(damage * RADIATION_SPEED_COEFFICIENT)
 			updatehealth()
 			if(!isSynthetic() && organs.len)
@@ -832,7 +832,7 @@
 
 			var/total_phoronloss = 0
 			for(var/obj/item/I in src)
-				if(I.contaminated || I.gurgled) //VOREStation Edit
+				if(I.contaminated)
 					if(check_belly(I)) continue //VOREStation Edit
 					if(src.species && src.species.get_bodytype() != "Vox")
 						// This is hacky, I'm so sorry.
@@ -1041,7 +1041,7 @@
 			adjustHalLoss(-1)
 
 		if (drowsyness)
-			drowsyness--
+			drowsyness = max(0, drowsyness - 1)
 			eye_blurry = max(2, eye_blurry)
 			if (prob(5))
 				sleeping += 1
@@ -1374,11 +1374,6 @@
 
 	// Puke if toxloss is too high
 	if(!stat)
-		if (getToxLoss() >= 30 && isSynthetic())
-			if(!confused)
-				if(prob(5))
-					to_chat(src, "<span class='danger'>You lose directional control!</span>")
-					Confuse(10)
 		if (getToxLoss() >= 45)
 			spawn vomit()
 

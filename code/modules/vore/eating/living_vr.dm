@@ -2,12 +2,14 @@
 /mob/living
 	var/digestable = 1					// Can the mob be digested inside a belly?
 	var/allowmobvore = 1				// Will simplemobs attempt to eat the mob?
+	var/showvoreprefs = 1				// Determines if the mechanical vore preferences button will be displayed on the mob or not.
 	var/obj/belly/vore_selected			// Default to no vore capability.
 	var/list/vore_organs = list()		// List of vore containers inside a mob
 	var/absorbed = 0					// If a mob is absorbed into another
 	var/weight = 137					// Weight for mobs for weightgain system
 	var/weight_gain = 1 				// How fast you gain weight
 	var/weight_loss = 0.5 				// How fast you lose weight
+//	var/tone = 25 						// AEIOU edit. Determine how MUSCLE GIRL you are. From 0 to 500
 	var/egg_type = "egg" 				// Default egg type.
 	var/feral = 0 						// How feral the mob is, if at all. Does nothing for non xenochimera at the moment.
 	var/reviving = 0					// Only used for creatures that have the xenochimera regen ability, so far.
@@ -21,7 +23,7 @@
 	var/fuzzy = 1						// Preference toggle for sharp/fuzzy icon.
 	var/tail_alt = 0					// Tail layer toggle.
 	var/can_be_drop_prey = 0
-	var/can_be_drop_pred = 1	//Mobs are pred by default.
+	var/can_be_drop_pred = 1			// Mobs are pred by default.
 
 //
 // Hook for generic creation of stuff on new creatures
@@ -253,6 +255,31 @@
 
 	return message
 
+
+//
+// Stuff for toning
+//
+
+/mob/living/proc/show_tone()
+	return TRUE //Can override if you want.
+
+/mob/living/carbon/human/show_tone()
+	//A uniform could hide it.
+	if(istype(w_uniform,/obj/item/clothing))
+		var/obj/item/clothing/under = w_uniform
+		if(under.hides_bulges)
+			return FALSE
+
+	//We return as soon as we find one, no need for 'else' really.
+	if(istype(wear_suit,/obj/item/clothing))
+		var/obj/item/clothing/suit = wear_suit
+		if(suit.hides_bulges)
+			return FALSE
+
+
+	return ..()
+
+
 //
 // Whether or not people can see our belly messages
 //
@@ -355,7 +382,7 @@
 		var/obj/effect/overlay/aiholo/holo = loc
 		holo.drop_prey() //Easiest way
 		log_and_message_admins("[key_name(src)] used the OOC escape button to get out of [key_name(holo.master)] (AI HOLO) ([holo ? "<a href='?_src_=holder;adminplayerobservecoodjump=1;X=[holo.x];Y=[holo.y];Z=[holo.z]'>JMP</a>" : "null"])")
-	
+
 	//Don't appear to be in a vore situation
 	else
 		to_chat(src,"<span class='alert'>You aren't inside anyone, though, is the thing.</span>")
@@ -405,7 +432,7 @@
 
 	// Prepare messages
 	if(user == pred) //Feeding someone to yourself
-		attempt_msg = text("<span class='warning'>[] is attemping to [] [] into their []!</span>",pred,lowertext(belly.vore_verb),prey,lowertext(belly.name))
+		attempt_msg = text("<span class='warning'>[] is attempting to [] [] into their []!</span>",pred,lowertext(belly.vore_verb),prey,lowertext(belly.name))
 		success_msg = text("<span class='warning'>[] manages to [] [] into their []!</span>",pred,lowertext(belly.vore_verb),prey,lowertext(belly.name))
 	else //Feeding someone to another person
 		attempt_msg = text("<span class='warning'>[] is attempting to make [] [] [] into their []!</span>",user,pred,lowertext(belly.vore_verb),prey,lowertext(belly.name))
@@ -609,3 +636,25 @@
 	set category = "Preferences"
 	set desc = "Switch sharp/fuzzy scaling for current mob."
 	appearance_flags ^= PIXEL_SCALE
+
+/mob/living/examine(mob/user)
+	. = ..()
+	if(showvoreprefs)
+		to_chat(user, "<span class='deptradio'><a href='?src=\ref[src];vore_prefs=1'>\[Mechanical Vore Preferences\]</a></span>")
+
+/mob/living/Topic(href, href_list)	//Can't find any instances of Topic() being overridden by /mob/living in polaris' base code, even though /mob/living/carbon/human's Topic() has a ..() call
+	if(href_list["vore_prefs"])
+		display_voreprefs(usr)
+	return ..()
+
+/mob/living/proc/display_voreprefs(mob/user)	//Called by Topic() calls on instances of /mob/living (and subtypes) containing vore_prefs as an argument
+	if(!user)
+		CRASH("display_voreprefs() was called without an associated user.")
+	var/dispvoreprefs = "<b>[src]'s vore preferences</b><br><br><br>"
+	dispvoreprefs += "<b>Digestable:</b> [digestable ? "Enabled" : "Disabled"]<br>"
+	dispvoreprefs += "<b>Mob Vore:</b> [allowmobvore ? "Enabled" : "Disabled"]<br>"
+	dispvoreprefs += "<b>Drop-nom prey:</b> [can_be_drop_prey ? "Enabled" : "Disabled"]<br>"
+	dispvoreprefs += "<b>Drop-nom pred:</b> [can_be_drop_pred ? "Enabled" : "Disabled"]<br>"
+	user << browse("<html><head><title>Vore prefs: [src]</title></head><body><center>[dispvoreprefs]</center></body></html>", "window=[name];size=200x300;can_resize=0;can_minimize=0")
+	onclose(user, "[name]")
+	return

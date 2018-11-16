@@ -469,6 +469,18 @@
 	reagent_state = LIQUID
 	color = "#B97A57"
 
+
+
+/datum/reagent/dormantnanobots
+	name = "Dormant Nanobots"
+	id = "dormantnanobots"
+	description = "Those little fellas seem to be sleeping."
+	taste_description = "Metal"
+	reagent_state = LIQUID
+	color = "#343251"
+
+
+
 /datum/reagent/luminol
 	name = "Luminol"
 	id = "luminol"
@@ -482,3 +494,11 @@
 
 /datum/reagent/luminol/touch_mob(var/mob/living/L)
 	L.reveal_blood()
+
+/datum/reagent/nutriment/biomass
+	name = "Biomass"
+	id = "biomass"
+	description = "A slurry of compounds that contains the basic requirements for life."
+	taste_description = "salty meat"
+	reagent_state = LIQUID
+	color = "#DF9FBF"

@@ -36,6 +36,8 @@
 	name = "alarm"
 	icon = 'icons/obj/monitors.dmi'
 	icon_state = "alarm0"
+	plane = TURF_PLANE
+	layer = ABOVE_TURF_LAYER
 	anchored = 1
 	use_power = 1
 	idle_power_usage = 80
@@ -323,7 +325,7 @@
 			icon_state = "alarm1"
 			new_color = "#DA0205"
 
-	set_light(l_range = 2, l_power = 0.5, l_color = new_color)
+	set_light(l_range = 2, l_power = 0.25, l_color = new_color)
 
 /obj/machinery/alarm/receive_signal(datum/signal/signal)
 	if(stat & (NOPOWER|BROKEN))
@@ -495,7 +497,7 @@
 	if(!(locked && !remote_connection) || remote_access || issilicon(user))
 		populate_controls(data)
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if(!ui)
 		ui = new(user, src, ui_key, "air_alarm.tmpl", name, 325, 625, master_ui = master_ui, state = state)
 		ui.set_initial_data(data)
@@ -765,6 +767,12 @@
 		return
 
 	if(istype(W, /obj/item/weapon/card/id) || istype(W, /obj/item/device/pda))// trying to unlock the interface with an ID card
+// // // BEGIN AEIOU EDIT // // //
+		toggle_locked(user)		//turned into a proc for alt-click functionality.
+	return ..()
+
+/obj/machinery/alarm/proc/toggle_locked(mob/user)
+	if(isliving(user) && (in_range(src,user) || issilicon(user)))		//we want isliving() so ghosts can't try any spooky business
 		if(stat & (NOPOWER|BROKEN))
 			user << "It does nothing"
 			return
@@ -775,7 +783,10 @@
 			else
 				user << "<span class='warning'>Access denied.</span>"
 			return
-	return ..()
+			
+/obj/machinery/alarm/AltClick(mob/user)
+	toggle_locked(user)
+// // // END AEIOU EDIT // // //
 
 /obj/machinery/alarm/power_change()
 	..()
@@ -804,6 +815,8 @@ FIRE ALARM
 	desc = "<i>\"Pull this in case of emergency\"</i>. Thus, keep pulling it forever."
 	icon = 'icons/obj/monitors.dmi'
 	icon_state = "fire0"
+	plane = TURF_PLANE
+	layer = ABOVE_TURF_LAYER
 	var/detecting = 1.0
 	var/working = 1.0
 	var/time = 10.0
@@ -839,14 +852,14 @@ FIRE ALARM
 	else
 		if(!detecting)
 			icon_state = "fire1"
-			set_light(l_range = 4, l_power = 2, l_color = "#ff0000")
+			set_light(l_range = 4, l_power = 0.9, l_color = "#ff0000")
 		else
 			icon_state = "fire0"
 			switch(seclevel)
-				if("green")	set_light(l_range = 2, l_power = 0.5, l_color = "#00ff00")
-				if("blue")	set_light(l_range = 2, l_power = 0.5, l_color = "#1024A9")
-				if("red")	set_light(l_range = 4, l_power = 2, l_color = "#ff0000")
-				if("delta")	set_light(l_range = 4, l_power = 2, l_color = "#FF6633")
+				if("green")	set_light(l_range = 2, l_power = 0.25, l_color = "#00ff00")
+				if("blue")	set_light(l_range = 2, l_power = 0.25, l_color = "#1024A9")
+				if("red")	set_light(l_range = 4, l_power = 0.9, l_color = "#ff0000")
+				if("delta")	set_light(l_range = 4, l_power = 0.9, l_color = "#FF6633")
 		add_overlay("overlay_[seclevel]")
 
 /obj/machinery/firealarm/fire_act(datum/gas_mixture/air, temperature, volume)

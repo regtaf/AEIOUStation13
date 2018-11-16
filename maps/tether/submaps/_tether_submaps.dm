@@ -2,6 +2,21 @@
 // This is so Travis can validate PoIs, and ensure future changes don't break PoIs, as PoIs are loaded at runtime and the compiler can't catch errors.
 
 //////////////////////////////////////////////////////////////////////////////
+/*
+
+/datum/map_template/tether_lateload/belt
+	name = "Tether - Belt"
+	desc = "Mining belt."
+	mappath = 'tether_mining.dmm'
+
+	associated_map_datum = /datum/map_z_level/tether_lateload/belt
+
+/datum/map_z_level/tether_lateload/belt
+//	z = Z_LEVEL_ABELT_VIRGO
+	name = "Belt"
+	flags = 0
+	*/
+
 /// Static Load
 /datum/map_template/tether_lateload/tether_misc
 	name = "Tether - Misc"
@@ -24,6 +39,25 @@
 /datum/map_z_level/tether_lateload/ships
 	name = "Ships"
 	flags = MAP_LEVEL_ADMIN|MAP_LEVEL_SEALED
+
+#include "underdark_pois/_templates.dm"
+/datum/map_template/tether_lateload/tether_underdark
+	name = "Tether - Underdark"
+	desc = "Mining, but harder."
+	mappath = 'tether_underdark.dmm'
+
+	associated_map_datum = /datum/map_z_level/tether_lateload/underdark
+
+/datum/map_z_level/tether_lateload/underdark
+	name = "Underdark"
+	flags = MAP_LEVEL_CONTACT|MAP_LEVEL_PLAYER
+	base_turf = /turf/simulated/mineral/floor/virgo3b
+
+/datum/map_template/tether_lateload/tether_underdark/on_map_loaded(z)
+	. = ..()
+	seed_submaps(list(z), 100, /area/mine/unexplored/underdark, /datum/map_template/underdark)
+	new /datum/random_map/automata/cave_system/no_cracks(null, 1, 1, z, world.maxx, world.maxy) // Create the mining Z-level.
+	new /datum/random_map/noise/ore(null, 1, 1, z, 64, 64)         // Create the mining ore distribution map.
 
 //////////////////////////////////////////////////////////////////////////////
 /// Away Missions
@@ -252,7 +286,7 @@
 		depleted = TRUE
 		return
 
-//Shadekin spawner. Could have them show up on any mission, so it's here.
+/*//Shadekin spawner. Could have them show up on any mission, so it's here.
 //Make sure to put them away from others, so they don't get demolished by rude mobs.
 /obj/tether_away_spawner/shadekin
 	name = "Shadekin Spawner"
@@ -266,3 +300,5 @@
 	mobs_to_pick_from = list(
 		/mob/living/simple_animal/shadekin
 	)
+//AEIOU EDIT: Shadekin do not exist in our lore
+*/

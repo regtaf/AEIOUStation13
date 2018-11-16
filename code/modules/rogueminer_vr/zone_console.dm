@@ -2,9 +2,9 @@
 // The zone control console, fluffed ingame as
 // a scanner console for the asteroid belt
 //////////////////////////////
-#define OUTPOST_Z 5
-#define TRANSIT_Z 2
-#define BELT_Z 7
+#define OUTPOST_Z 8
+#define TRANSIT_Z 5
+#define BELT_Z 11
 
 /obj/machinery/computer/roguezones
 	name = "asteroid belt scanning computer"
@@ -41,7 +41,7 @@
 	user.set_machine(src)
 
 
-	var/chargePercent = min(100, ((((world.time - rm_controller.last_scan) / 10) / 60) / rm_controller.scan_wait) * 100)
+	var/chargePercent = min(100, ((((world.time - rm_controller.last_scan) / 10) / 60) / rm_controller.scan_wait) * 50)
 	var/curZoneOccupied = rm_controller.current_zone ? rm_controller.current_zone.is_occupied() : 0
 
 	var/list/data = list()
@@ -79,7 +79,7 @@
 	// Permit emergency recall of the shuttle if its stranded in a zone with just dead people.
 	data["can_recall_shuttle"] = (shuttle_control && shuttle_control.z == BELT_Z && !curZoneOccupied)
 
-	ui = nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "zone_console.tmpl", src.name, 600, 400)
 		ui.set_initial_data(data)
@@ -100,7 +100,7 @@
 				failsafe_shuttle_recall()
 
 	src.add_fingerprint(usr)
-	nanomanager.update_uis(src)
+	GLOB.nanomanager.update_uis(src)
 
 /obj/machinery/computer/roguezones/proc/scan_for_new_zone()
 	if(scanning) return

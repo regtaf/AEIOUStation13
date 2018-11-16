@@ -355,15 +355,13 @@
 	name = "KSS-8 security armor"
 	desc = "A set of armor made from pieces of many other armors. There are two orange holobadges on it, one on the chestplate, one on the steel flank plates. The holobadges appear to be russian in origin. 'Kosmicheskaya Stantsiya-8' is printed in faded white letters on one side, along the spine. It smells strongly of dog."
 	species_restricted = null //Species restricted since all it cares about is a taur half
-	icon_override = 'icons/mob/taursuits_vr.dmi' //Needs to be this since it's 64*32
+	icon = 'icons/mob/taursuits_wolf_vr.dmi'
 	icon_state = "serdy_armor"
+	item_state = "serdy_armor"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS //It's a full body suit, minus hands and feet. Arms and legs should be protected, not just the torso. Retains normal security armor values still.
 
 /obj/item/clothing/suit/armor/vest/wolftaur/serdy/mob_can_equip(var/mob/living/carbon/human/H, slot, disable_warning = 0)
 	if(istype(H) && istype(H.tail_style, /datum/sprite_accessory/tail/taur/wolf))
-		icon_override = 'icons/mob/taursuits_vr.dmi' //Just in case
-		icon_state = "serdy_armor" //Just in case
-		pixel_x = -16
 		return ..()
 	else
 		to_chat(H, "<span class='warning'>You need to have a wolf-taur half to wear this.</span>")
@@ -706,6 +704,28 @@
 /obj/item/weapon/implanter/reagent_generator/savannah
 	implant_type = /obj/item/weapon/implant/reagent_generator/savannah
 
+
+
+
+//lbnesquik aka Kates aka xenomom melk implant
+/obj/item/weapon/implant/reagent_generator/may
+    name = "lactation implant"
+    desc = "This is an implant that allows the user to lactate."
+    generated_reagents = list("milk" = 2)
+    reagent_name = "milk"
+    usable_volume = 1000
+
+    empty_message = list("Your breasts feel unusually empty.", "Your chest feels lighter - your milk supply is empty!", "Your milk reserves have run dry.", "Your grateful nipples ache as the last of your milk leaves them.")
+    full_message = list("Your breasts ache badly - they are swollen and feel fit to burst!", "You need to be milked! Your breasts feel bloated, eager for release.", "Your milky breasts are starting to leak...")
+    emote_descriptor = list("squeezes May's nipples, milking them", "milks May's breasts", "extracts milk")
+    self_emote_descriptor = list("squeeze out", "extract")
+    random_emote = list("surpresses a moan", "gasps sharply", "fidget around", "bites her lower lip")
+    verb_name = "Milk"
+    verb_desc = "Grab May's breasts and milk her, storing her fresh, warm milk in a container. This will undoubtedly turn her on."
+
+/obj/item/weapon/implanter/reagent_generator/may
+    implant_type = /obj/item/weapon/implant/reagent_generator/may
+
 //SpoopyLizz: Roiz Lizden
 //I made this! Woo!
 //implant
@@ -727,7 +747,7 @@
 	random_emote = list("hisses softly with a blush on his face", "yelps in embarrassment", "grunts a little")
 	assigned_proc = /mob/living/carbon/human/proc/use_reagent_implant_roiz
 
-/obj/item/weapon/implant/reagent_generator/roiz/implanted(mob/living/carbon/source)
+/obj/item/weapon/implant/reagent_generator/roiz/post_implant(mob/living/carbon/source)
 	processing_objects += src
 	to_chat(source, "<span class='notice'>You implant [source] with \the [src].</span>")
 	source.verbs |= assigned_proc
@@ -795,7 +815,7 @@
 	random_emote = list("hisses softly with a blush on her face", "bites down on her lower lip", "lets out a light huff")
 	assigned_proc = /mob/living/carbon/human/proc/use_reagent_implant_jasmine
 
-/obj/item/weapon/implant/reagent_generator/jasmine/implanted(mob/living/carbon/source)
+/obj/item/weapon/implant/reagent_generator/jasmine/post_implant(mob/living/carbon/source)
 	processing_objects += src
 	to_chat(source, "<span class='notice'>You implant [source] with \the [src].</span>")
 	source.verbs |= assigned_proc
@@ -863,7 +883,7 @@
 	random_emote = list("hisses softly with a blush on her face", "yelps in embarrassment", "grunts a little")
 	assigned_proc = /mob/living/carbon/human/proc/use_reagent_implant_yonra
 
-/obj/item/weapon/implant/reagent_generator/yonra/implanted(mob/living/carbon/source)
+/obj/item/weapon/implant/reagent_generator/yonra/post_implant(mob/living/carbon/source)
 	processing_objects += src
 	to_chat(source, "<span class='notice'>You implant [source] with \the [src].</span>")
 	source.verbs |= assigned_proc
@@ -947,7 +967,7 @@
 	random_emote = list("trembles and huffs, panting from the exertion.", "sees what has happened and covers her face with both hands!", "whimpers softly, her legs shivering, knees pointed inward from the feeling.")
 	assigned_proc = /mob/living/carbon/human/proc/use_reagent_implant_rischi
 
-/obj/item/weapon/implant/reagent_generator/rischi/implanted(mob/living/carbon/source)
+/obj/item/weapon/implant/reagent_generator/rischi/post_implant(mob/living/carbon/source)
 	processing_objects += src
 	to_chat(source, "<span class='notice'>You implant [source] with \the [src].</span>")
 	source.verbs |= assigned_proc
@@ -997,70 +1017,6 @@
 
 		rimplant.reagents.remove_any(rimplant.transfer_amount)
 
-/obj/item/weapon/implant/reagent_generator/pumila_apple
-	name = "apple laying implant"
-	desc = "This is an implant that allows the user to grow apples."
-	generated_reagents = list("sugar" = 2) //This actually allows them to.
-	usable_volume = 250 //Five apples. Let's not get /too/ crazy here.
-	transfer_amount = 50
-
-	empty_message = list("Your have no apples on you.", "You have a distinct lack of apples..")
-	full_message = list("You have multiple apples on you, ready for harvest!", "There are a multitude of apples awaiting harvest on you!")
-	emote_descriptor = list("an apple right off of Pumila!", "a large apple off Pumila!")
-	var/verb_descriptor = list("grabs", "snatches", "picks")
-	var/self_verb_descriptor = list("grab", "snatch", "pick")
-	var/short_emote_descriptor = list("picks", "grabs")
-	self_emote_descriptor = list("grab", "pick", "snatch")
-	assigned_proc = /mob/living/carbon/human/proc/use_reagent_implant_pumila_apple
-
-/obj/item/weapon/implant/reagent_generator/pumila_apple/implanted(mob/living/carbon/source)
-	processing_objects += src
-	to_chat(source, "<span class='notice'>You implant [source] with \the [src].</span>")
-	source.verbs |= assigned_proc
-	return 1
-
-/obj/item/weapon/implanter/reagent_generator/pumila_apple
-	implant_type = /obj/item/weapon/implant/reagent_generator/pumila_apple
-
-/mob/living/carbon/human/proc/use_reagent_implant_pumila_apple()
-	set name = "Grab Apple"
-	set desc = "Grab an apple off of Pumila."
-	set category = "Object"
-	set src in view(1)
-
-	//do_reagent_implant(usr)
-	if(!isliving(usr) || !usr.canClick())
-		return
-
-	if(usr.incapacitated() || usr.stat > CONSCIOUS)
-		return
-
-	var/obj/item/weapon/implant/reagent_generator/roiz/rimplant
-	for(var/I in contents)
-		if(istype(I, /obj/item/weapon/implant/reagent_generator))
-			rimplant = I
-			break
-	if (rimplant)
-		if(rimplant.reagents.total_volume < rimplant.transfer_amount)
-			to_chat(src, "<span class='notice'>[pick(rimplant.empty_message)]</span>")
-			return
-
-		var/datum/seed/S = plant_controller.seeds["apple"] //crosses fingers.
-		S.harvest(usr,0,0,1)
-
-		var/index = rand(0,2)
-
-		if (usr != src)
-			var/emote = rimplant.emote_descriptor[index]
-			var/verb_desc = rimplant.verb_descriptor[index]
-			var/self_verb_desc = rimplant.self_verb_descriptor[index]
-			usr.visible_message("<span class='notice'>[usr] [verb_desc] [emote]</span>",
-							"<span class='notice'>You [self_verb_desc] [emote]</span>")
-		else
-			visible_message("<span class='notice'>[src] [pick(rimplant.short_emote_descriptor)] an apple.</span>",
-								"<span class='notice'>You [pick(rimplant.self_emote_descriptor)] an apple.</span>")
-
-		rimplant.reagents.remove_any(rimplant.transfer_amount)
 /*
 /obj/item/weapon/implant/reagent_generator/pumila_nectar //Bugged. Two implants at once messes things up.
 	generated_reagents = list("honey" = 2)
@@ -1244,7 +1200,7 @@
 	item_state = "tronket"
 	overlay_state = "tronket"
 	slot_flags = SLOT_TIE
-	slot = "over"
+	slot = ACCESSORY_SLOT_DECOR
 
 /obj/item/clothing/accessory/flops
 	name = "drop straps"
@@ -1255,7 +1211,7 @@
 	item_state = "flops"
 	overlay_state = "flops"
 	slot_flags = SLOT_TIE
-	slot = "over"
+	slot = ACCESSORY_SLOT_DECOR
 
 //The perfect adminboos device?
 /obj/item/device/perfect_tele
@@ -1291,8 +1247,8 @@
 	for(var/obj/item/device/perfect_tele_beacon/B in beacons)
 		B.tele_hand = null
 	beacons.Cut()
-	qdel_null(power_source)
-	qdel_null(spk)
+	QDEL_NULL(power_source)
+	QDEL_NULL(spk)
 	return ..()
 
 /obj/item/device/perfect_tele/update_icon()
@@ -1382,58 +1338,65 @@
 	else
 		..()
 
-/obj/item/device/perfect_tele/afterattack(mob/living/target, mob/living/user, proximity)
-	//No, you can't teleport people from over there.
-	if(!proximity)
-		return
-
+/obj/item/device/perfect_tele/proc/teleport_checks(mob/living/target,mob/living/user)
 	//Uhhuh, need that power source
 	if(!power_source)
 		to_chat(user,"<span class='warning'>\The [src] has no power source!</span>")
-		return
+		return FALSE
 
 	//Check for charge
 	if(!power_source.check_charge(charge_cost))
 		to_chat(user,"<span class='warning'>\The [src] does not have enough power left!</span>")
-		return
+		return FALSE
 
 	//Only mob/living need apply.
 	if(!istype(user) || !istype(target))
-		return
+		return FALSE
 
 	//No, you can't teleport buckled people.
 	if(target.buckled)
 		to_chat(user,"<span class='warning'>The target appears to be attached to something...</span>")
-		return
+		return FALSE
 
 	//No, you can't teleport if it's not ready yet.
 	if(!ready)
 		to_chat(user,"<span class='warning'>\The [src] is still recharging!</span>")
-		return
+		return FALSE
 
 	//No, you can't teleport if there's no destination.
 	if(!destination)
 		to_chat(user,"<span class='warning'>\The [src] doesn't have a current valid destination set!</span>")
-		return
+		return FALSE
 
 	//No, you can't teleport if there's a jammer.
 	if(is_jammed(src) || is_jammed(destination))
 		to_chat(user,"<span class='warning'>\The [src] refuses to teleport you, due to strong interference!</span>")
-		return
+		return FALSE
 
 	//No, you can't port to or from away missions. Stupidly complicated check.
 	var/turf/uT = get_turf(user)
 	var/turf/dT = get_turf(destination)
 	if(!uT || !dT)
-		return
+		return FALSE
 
 	if( (uT.z != dT.z) && ( (uT.z > max_default_z_level() ) || (dT.z > max_default_z_level()) ) )
 		to_chat(user,"<span class='warning'>\The [src] can't teleport you that far!</span>")
-		return
+		return FALSE
 
 	if(uT.block_tele || dT.block_tele)
 		to_chat(user,"<span class='warning'>Something is interfering with \the [src]!</span>")
+		return FALSE
+
+	//Seems okay to me!
+	return TRUE
+
+/obj/item/device/perfect_tele/afterattack(mob/living/target, mob/living/user, proximity)
+	//No, you can't teleport people from over there.
+	if(!proximity)
 		return
+
+	if(!teleport_checks(target,user))
+		return //The checks proc can send them a message if it wants.
 
 	//Bzzt.
 	ready = 0
@@ -1447,6 +1410,7 @@
 		to_chat(user,"<span class='warning'>\The [src] malfunctions and sends you to the wrong beacon!</span>")
 
 	//Destination beacon vore checking
+	var/turf/dT = get_turf(destination)
 	var/atom/real_dest = dT
 
 	var/atom/real_loc = destination.loc
@@ -1570,6 +1534,21 @@
 				forceMove(bellychoice)
 				user.visible_message("<span class='warning'>[user] eats a telebeacon!</span>","You eat the the beacon!")
 
+// A single-beacon variant for use by miners (or whatever)
+/obj/item/device/perfect_tele/one_beacon
+	name = "mini-translocator"
+	desc = "A more limited translocator with a single beacon, useful for some things, like setting the mining department on fire accidentally. Legal for use in the pursuit of NanoTrasen interests, namely mining and exploration."
+	icon_state = "minitrans"
+	beacons_left = 1 //Just one
+	charge_cost = 2400 //One per
+
+/obj/item/device/perfect_tele/one_beacon/teleport_checks(mob/living/target,mob/living/user)
+	var/turf/T = get_turf(destination)
+	if(T && user.z != T.z)
+		to_chat(user,"<span class='warning'>\The [src] is too far away from the beacon. Try getting closer first!</span>")
+		return FALSE
+	return ..()
+
 //InterroLouis: Ruda Lizden
 /obj/item/clothing/accessory/badge/holo/detective/ruda
 	name = "Hisstective's Badge"
@@ -1683,7 +1662,7 @@
 	random_emote = list("hisses softly with a blush on his face", "yelps in embarrassment", "grunts a little")
 	assigned_proc = /mob/living/carbon/human/proc/use_reagent_implant_evian
 
-/obj/item/weapon/implant/reagent_generator/evian/implanted(mob/living/carbon/source)
+/obj/item/weapon/implant/reagent_generator/evian/post_implant(mob/living/carbon/source)
 	processing_objects += src
 	to_chat(source, "<span class='notice'>You implant [source] with \the [src].</span>")
 	source.verbs |= assigned_proc
@@ -1744,6 +1723,37 @@
 		return
 	else
 		..()
+
+
+
+//ForFoxSake:Lysia Blackoak
+/obj/item/clothing/glasses/goggles/fluff/eblindfold
+	name = "enchanted blindfold"
+	desc = "An ancient looking strip of cloth meant to cover the eyes."
+	icon_state = "blindfold"
+	item_state = "blindfold"
+	item_state_slots = list(slot_r_hand_str = "blindfold", slot_l_hand_str = "blindfold")
+
+//Pixelexip:Casey Hall
+/obj/item/clothing/glasses/sunglasses/fluff/clout
+	name = "clout goggles"
+	desc = "These ain't glasses, baby. These CLOUT GOGGLES."
+	icon = 'icons/vore/custom_items_vr.dmi'
+	icon_state = "clout_goggles"
+
+	icon_override = 'icons/vore/custom_clothes_vr.dmi'
+	item_state = "clout_goggles"
+	item_state_slots = list(slot_r_hand_str = "sun", slot_l_hand_str = "sun")
+
+//ForFoxSake:Alyona Fuchs
+/obj/item/clothing/under/rank/captain/fluff/white
+	name = "Asphodelus' Captain's uniform"
+	desc = "A formal uniform for a Captain, cleared to be worn as a Colony Director."
+	icon = 'icons/vore/custom_clothes_vr.dmi'
+	icon_state = "capform_white"
+
+	icon_override = "capform_white_s"
+	item_state = "capform_white"
 
 //jacknoir413:Areax Third
 /obj/item/weapon/melee/baton/fluff/stunstaff
@@ -1954,6 +1964,40 @@
 	icon_state = "modkit"
 
 	from_helmet = /obj/item/clothing/head/helmet/space/void/security
-	from_suit = /obj/item/clothing/suit/space/void/security/taur
+	from_suit = /obj/item/clothing/suit/space/void/security
 	to_helmet = /obj/item/clothing/head/helmet/space/void/security/hasd
 	to_suit = /obj/item/clothing/suit/space/void/security/hasd
+
+//InterroLouis - Kai Highlands
+/obj/item/borg/upgrade/modkit/chassis_mod/kai
+	name = "kai chassis"
+	desc = "Makes your KA green. All the fun of having a more powerful KA without actually having a more powerful KA."
+	cost = 0
+	denied_type = /obj/item/borg/upgrade/modkit/chassis_mod
+	chassis_icon = "kineticgun_K"
+	chassis_name = "Kai-netic Accelerator"
+	var/chassis_desc = "A self recharging, ranged mining tool that does increased damage in low temperature. Capable of holding up to six slots worth of mod kits. It seems to have been painted an ugly green, and has a small image of a bird scratched crudely into the stock."
+	var/chassis_icon_file = 'icons/vore/custom_guns_vr.dmi'
+
+/obj/item/borg/upgrade/modkit/chassis_mod/kai/install(obj/item/weapon/gun/energy/kinetic_accelerator/KA, mob/user)
+	KA.desc = chassis_desc
+	KA.icon = chassis_icon_file
+	..()
+/obj/item/borg/upgrade/modkit/chassis_mod/kai/uninstall(obj/item/weapon/gun/energy/kinetic_accelerator/KA)
+	KA.desc = initial(KA.desc)
+	KA.icon = initial(KA.icon)
+	..()
+
+//ArgobargSoup:Lynn Shady
+/obj/item/device/flashlight/pen/fluff/lynn
+	name = "Lynn's penlight"
+	desc = "A personalized penlight, a bit bulkier than the standard model.  Blue, with a medical cross on it, and the name Lynn Shady engraved in gold."
+
+	icon = 'icons/vore/custom_items_vr.dmi'
+	icon_state = "penlightlynn"
+	
+//Knightfall5:Ashley Kifer
+/obj/item/clothing/accessory/medal/nobel_science/fluff/ashley
+	name = "nobel sciences award"
+	desc = "A bronze medal which represents significant contributions to the field of science or engineering, this one has Ashley Kifer engraved on it."
+

@@ -352,6 +352,10 @@
 	name = "Modified LeMat"
 	desc = "The LeMat Revolver is a 9 shot revolver with a secondary firing barrel for loading shotgun shells. Uses .38-Special and 12g rounds depending on the barrel. This one appears to have had it's secondary barrel sealed off and looks to be in pristine condition. Either it's brand new, or its owner takes very good care of it."
 	icon_state = "lemat"
+	max_shells = 9
+	caliber = ".38"
+	ammo_type = /obj/item/ammo_casing/a38
+	preserve_item = FALSE
 
 //////////////////// Energy Weapons ////////////////////
 
@@ -516,11 +520,11 @@
 /obj/item/weapon/gun/energy/gun/martin/proc/update_mode()
 	var/datum/firemode/current_mode = firemodes[sel_mode]
 	switch(current_mode.name)
-		if("stun") overlays += "taser_pdw"
-		if("lethal") overlays += "lazer_pdw"
+		if("stun") add_overlay("taser_pdw")
+		if("lethal") add_overlay("lazer_pdw")
 
 /obj/item/weapon/gun/energy/gun/martin/update_icon()
-	overlays.Cut()
+	cut_overlays()
 	update_mode()
 
 /////////////////////////////////////////////////////
@@ -537,6 +541,7 @@
 
 /obj/item/projectile/beam/imperial
 	name = "laser beam"
+	fire_sound = 'sound/weapons/mandalorian.ogg'
 	icon_state = "darkb"
 	light_color = "#8837A3"
 	muzzle_type = /obj/effect/projectile/darkmatter/muzzle
@@ -613,6 +618,7 @@
 	name = "\improper SMG magazine (9mm armor-piercing)"
 	ammo_type = /obj/item/ammo_casing/a9mm/ap
 
+/* Seems to have been de-coded?
 /obj/item/ammo_magazine/m9mml/flash
 	name = "\improper SMG magazine (9mm flash)"
 	ammo_type = /obj/item/ammo_casing/a9mmf
@@ -624,6 +630,7 @@
 /obj/item/ammo_magazine/m9mml/practice
 	name = "\improper SMG magazine (9mm practice)"
 	ammo_type = /obj/item/ammo_casing/a9mmp
+*/
 
 //.357 special ammo
 /obj/item/ammo_magazine/s357/stun
@@ -736,10 +743,6 @@
 	var/recharging = 0
 
 	projectile_type = /obj/item/projectile/beam
-	firemodes = list(
-		list(mode_name="normal", fire_delay=12, projectile_type=/obj/item/projectile/beam, charge_cost = 300),
-		list(mode_name="low-power", fire_delay=8, projectile_type=/obj/item/projectile/beam/weaklaser, charge_cost = 60),
-		)
 
 /obj/item/weapon/gun/energy/frontier/unload_ammo(var/mob/user)
 	if(recharging)
@@ -771,6 +774,13 @@
 /obj/item/weapon/gun/energy/frontier/ex_act() //|rugged|
 	return
 
+//Needed to fix a bug with the holdout phaser
+/obj/item/weapon/gun/energy/frontier/basic
+	firemodes = list(
+		list(mode_name="normal", fire_delay=12, projectile_type=/obj/item/projectile/beam, charge_cost = 300),
+		list(mode_name="low-power", fire_delay=8, projectile_type=/obj/item/projectile/beam/weaklaser, charge_cost = 60),
+	)
+
 /obj/item/weapon/gun/energy/frontier/locked
 	desc = "An extraordinarily rugged laser weapon, built to last and requiring effectively no maintenance. Includes a built-in crank charger for recharging away from civilization. This one has a safety interlock that prevents firing while in proximity to the facility."
 	req_access = list(access_armory) //for toggling safety
@@ -800,3 +810,39 @@
 			to_chat(user, "<span class='warning'>The safety device prevents the gun from firing this close to the facility.</span>")
 			return 0
 	return ..()
+
+//Needed to fix a bug with the holdout phaser
+/obj/item/weapon/gun/energy/frontier/locked/basic
+	firemodes = list(
+		list(mode_name="normal", fire_delay=12, projectile_type=/obj/item/projectile/beam, charge_cost = 300),
+		list(mode_name="low-power", fire_delay=8, projectile_type=/obj/item/projectile/beam/weaklaser, charge_cost = 60),
+	)
+
+//Expeditionary Holdout Phaser
+/obj/item/weapon/gun/energy/frontier/locked/holdout
+	name = "holdout frontier phaser"
+	desc = "A recently introduced weapon intended for self defense by expeditionary support. It includes the same crank charger as the frontier phaser."
+	icon = 'icons/obj/gun_vr.dmi'
+	icon_state = "PDW"
+	item_state = "gun"
+	w_class = ITEMSIZE_SMALL
+	firemodes = list(
+		list(mode_name="normal", fire_delay=12, projectile_type=/obj/item/projectile/beam, charge_cost = 1200),
+		list(mode_name="low-power", fire_delay=8, projectile_type=/obj/item/projectile/beam/weaklaser, charge_cost = 240),
+	)
+
+/obj/item/weapon/gun/energy/frontier/locked/holdout/proc/update_mode()
+	var/datum/firemode/current_mode = firemodes[sel_mode]
+	switch(current_mode.name)
+		if("low-power") add_overlay("taser_pdw")
+		if("normal") add_overlay("lazer_pdw")
+
+/obj/item/weapon/gun/energy/frontier/locked/holdout/update_icon()
+	cut_overlays()
+	if(recharging)
+		icon_state = "[initial(icon_state)]_pump"
+		update_held_icon()
+		return
+	else
+		icon_state = "[initial(icon_state)]"
+		update_mode()

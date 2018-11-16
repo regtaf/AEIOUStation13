@@ -32,6 +32,9 @@
 	//var/magazine_states = 0
 	//var/list/icon_keys = list()		//keys
 	//var/list/ammo_states = list()	//values
+	
+	//AEIOU vars
+	var/hide_ammo_count = FALSE		//do we want to hide ammo, for whatever reason (e.g. a concealed gun/custom loaded text)?
 
 /obj/item/weapon/gun/projectile/New(loc, var/starts_loaded = 1)
 	..()
@@ -41,6 +44,7 @@
 				loaded += new ammo_type(src)
 		if(ispath(magazine_type) && (load_method & MAGAZINE))
 			ammo_magazine = new magazine_type(src)
+			allowed_magazines += /obj/item/ammo_magazine/smart
 	update_icon()
 
 /obj/item/weapon/gun/projectile/consume_next_projectile()
@@ -50,7 +54,7 @@
 		if(handle_casings != HOLD_CASINGS)
 			loaded -= chambered
 	else if(ammo_magazine && ammo_magazine.stored_ammo.len)
-		chambered = ammo_magazine.stored_ammo[1]
+		chambered = ammo_magazine.stored_ammo[ammo_magazine.stored_ammo.len]
 		if(handle_casings != HOLD_CASINGS)
 			ammo_magazine.stored_ammo -= chambered
 
@@ -226,9 +230,10 @@
 
 /obj/item/weapon/gun/projectile/examine(mob/user)
 	..(user)
-	if(ammo_magazine)
-		user << "It has \a [ammo_magazine] loaded."
-	user << "Has [getAmmo()] round\s remaining."
+	if(!hide_ammo_count)
+		if(ammo_magazine)
+			user << "It has \a [ammo_magazine] loaded."
+		user << "Has [getAmmo()] round\s remaining."
 	return
 
 /obj/item/weapon/gun/projectile/proc/getAmmo()

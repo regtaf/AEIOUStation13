@@ -16,15 +16,20 @@
 	melee_damage_lower = 5
 	melee_damage_upper = 10
 
+	response_help = "pets the"
+	response_disarm = "gently baps the"
+	response_harm = "hits the"
+
 	speak_chance = 2
 	speak = list("Meow!","Esp!","Purr!","HSSSSS","Mew?","Nya~")
 	speak_emote = list("purrs","meows")
 	emote_hear = list("meows","mews")
-	emote_see = list("shakes her head","shivers")
-	attacktext = list("swatted")
+	emote_see = list("shakes her head","shivers","stretches","grooms herself")
+	attacktext = list("swatted","bapped")
 
 	var/random_skin = 1
 	var/list/skins = list(
+		"catgirl",
 		"catgirlnude",
 		"catgirlbikini",
 		"catgirlrednude",
@@ -50,11 +55,11 @@
 /mob/living/simple_animal/catgirl
 	vore_active = 1
 	vore_bump_chance = 5
-	vore_pounce_chance = 50
+	vore_pounce_chance = 30
 	vore_standing_too = 1
 	vore_ignores_undigestable = 0 // Catgirls just want to eat yoouuu
 	vore_default_mode = DM_HOLD // Chance that catgirls just wanna bellycuddle yoouuuu!
-	vore_digest_chance = 25 // But squirming might make them gurgle...
+	vore_digest_chance = 15 // But squirming might make them gurgle...
 	vore_icons = SA_ICON_LIVING | SA_ICON_REST
 
 /mob/living/simple_animal/catgirl/retaliate

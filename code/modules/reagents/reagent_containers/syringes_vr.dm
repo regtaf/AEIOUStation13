@@ -13,7 +13,7 @@
 	update_icon()
 
 /obj/item/weapon/reagent_containers/syringe/Destroy()
-	qdel_null_list(viruses)
+	QDEL_NULL_LIST(viruses)
 	LAZYCLEARLIST(targets)
 	return ..()
 
@@ -36,14 +36,18 @@
 	targets |= hash
 
 	//Grab any viruses they have
-	if(LAZYLEN(target.virus2.len))
+	if(iscarbon(target) && LAZYLEN(target.virus2.len))
 		LAZYINITLIST(viruses)
 		var/datum/disease2/disease/virus = pick(target.virus2.len)
 		viruses[hash] = virus.getcopy()
 
 	//Dirtiness should be very low if you're the first injectee. If you're spam-injecting 4 people in a row around you though,
 	//This gives the last one a 30% chance of infection.
-	if(prob(dirtiness+(targets.len-1)*10))
+	var/infect_chance = dirtiness        //Start with dirtiness
+	if(infect_chance <= 10 && (hash in targets)) //Extra fast uses on target is free
+		infect_chance = 0
+	infect_chance += (targets.len-1)*10    //Extra 10% per extra target
+	if(prob(infect_chance))
 		log_and_message_admins("[loc] infected [target]'s [eo.name] with \the [src].")
 		infect_limb(eo)
 

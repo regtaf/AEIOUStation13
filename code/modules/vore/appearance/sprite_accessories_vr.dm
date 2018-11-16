@@ -1,6 +1,6 @@
 /*
 	Hello and welcome to VOREStation sprite_accessories: For a more general overview
-	please read sprite_accessories.dm. This file is for ears, tails, and taur bodies!
+	please read sprite_accessories.dm. This file is for ears and tails.
 	This is intended to be friendly for people with little to no actual coding experience.
 	!!WARNING!!: changing existing accessory information can be VERY hazardous to savefiles,
 	to the point where you may completely corrupt a server's savefiles. Please refrain
@@ -88,20 +88,69 @@
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
 
+/datum/sprite_accessory/ears/curly_bug
+	name = "curly antennae, colorable"
+	desc = ""
+	icon_state = "curly_bug"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/dual_robot
+	name = "synth antennae, colorable"
+	desc = ""
+	icon_state = "dual_robot_antennae"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/right_robot
+	name = "right synth, colorable"
+	desc = ""
+	icon_state = "right_robot_antennae"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/left_robot
+	name = "left synth, colorable"
+	desc = ""
+	icon_state = "left_robot_antennae"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/ears/oni_h1
 	name = "oni horns"
 	desc = ""
 	icon_state = "oni-h1"
+
+/datum/sprite_accessory/ears/oni_h1_c
+	name = "oni horns, colorable"
+	desc = ""
+	icon_state = "oni-h1_c"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
 
 /datum/sprite_accessory/ears/demon_horns1
 	name = "demon horns"
 	desc = ""
 	icon_state = "demon-horns1"
 
+/datum/sprite_accessory/ears/demon_horns1_c
+	name = "demon horns, colorable"
+	desc = ""
+	icon_state = "demon-horns1_c"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/ears/demon_horns2
 	name = "demon horns, colorable(outward)"
 	desc = ""
 	icon_state = "demon-horns2"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/dragon_horns
+	name = "dragon horns, colorable"
+	desc = ""
+	icon_state = "dragon-horns"
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
 
@@ -170,6 +219,13 @@
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
 
+/datum/sprite_accessory/ears/smallbear
+	name = "small bear"
+	desc = ""
+	icon_state = "smallbear"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/ears/squirrelhc
 	name = "squirrel, colorable"
 	desc = ""
@@ -207,6 +263,28 @@
 	color_blend_mode = ICON_MULTIPLY
 	extra_overlay = "antlers_mark"
 
+/datum/sprite_accessory/ears/smallantlers
+	name = "small antlers"
+	desc = ""
+	icon_state = "smallantlers"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/smallantlers_e
+	name = "small antlers with ears"
+	desc = ""
+	icon_state = "smallantlers"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "deer"
+
+/datum/sprite_accessory/ears/deer
+	name = "deer ears"
+	desc = ""
+	icon_state = "deer"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/ears/cow
 	name = "cow, horns"
 	desc = ""
@@ -223,6 +301,13 @@
 	name = "cow, no horns"
 	desc = ""
 	icon_state = "cow-nohorns"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/caprahorns
+	name = "caprine horns"
+	desc = ""
+	icon_state = "caprahorns"
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
 
@@ -252,6 +337,13 @@
 	name = "sleek ears"
 	desc = ""
 	icon_state = "sleek"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/ears/drake
+	name = "drake frills"
+	desc = ""
+	icon_state = "drake"
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
 
@@ -375,6 +467,10 @@
 	icon_state = "alurane-ears"
 	ckeys_allowed = list("natje")
 
+
+
+
+
 /*
 ////////////////////////////
 /  =--------------------=  /
@@ -413,6 +509,7 @@
 	desc = ""
 	icon_state = "spider-legs"
 	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/wing/moth
 	name = "moth wings"
 	desc = ""
@@ -519,6 +616,35 @@
 	icon_state = "nevrean_s"
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
+
+
+/datum/sprite_accessory/wing/lanius_crown
+		name = "Spike Crown"
+		icon = 'icons/mob/human_races/lanius.dmi'
+		desc = ""
+		do_colouration = 1
+		color_blend_mode = ICON_MULTIPLY
+		icon_state = "lanius_spikes"
+		species_allowed = list("Lanius")
+
+/datum/sprite_accessory/wing/lanius_crown_alt
+		name = "Spine Crown"
+		icon = 'icons/mob/human_races/r_lanius.dmi'
+		desc = ""
+		do_colouration = 1
+		color_blend_mode = ICON_MULTIPLY
+		icon_state = "spikes_alt"
+		species_allowed = list("Lanius")
+
+/datum/sprite_accessory/wing/lanius_shoulderblades
+		name = "Big Shoulderblades"
+		icon = 'icons/mob/human_races/r_lanius.dmi'
+		desc = ""
+		do_colouration = 1
+		color_blend_mode = ICON_MULTIPLY
+		icon_state = "shoulderblades"
+		species_allowed = list("Lanius")
+
 
 /*
 ////////////////////////////
@@ -682,12 +808,14 @@
 	icon_state = "fantail"
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/tail/wagtail
 	name = "avian wagtail, colorable"
 	desc = ""
 	icon_state = "wagtail"
 	do_colouration = 1
 	color_blend_mode = ICON_MULTIPLY
+
 /datum/sprite_accessory/tail/crossfox
 	name = "cross fox"
 	desc = ""
@@ -814,6 +942,13 @@
 	desc = ""
 	icon_state = "tigresstail"
 	ckeys_allowed = list("hoodoo")
+
+/datum/sprite_accessory/tail/satyr
+	name = "goat legs, colorable"
+	desc = ""
+	icon_state = "satyr"
+	color_blend_mode = ICON_MULTIPLY
+	do_colouration = 1
 
 /datum/sprite_accessory/tail/tailmaw
 	name = "tailmaw, colorable"
@@ -1127,3 +1262,259 @@
 	icon_state = "zenghu_taj"
 
 //Taurs moved to a separate file due to extra code around them
+
+//Buggo Abdomens!
+
+/datum/sprite_accessory/tail/buggo
+	name = "Bug abdomen, colorable"
+	desc = ""
+	icon_state = "buggo_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/tail/buggobee
+	name = "Bug abdomen, bee top, dual-colorable"
+	desc = ""
+	icon_state = "buggo_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobee_markings"
+
+/datum/sprite_accessory/tail/buggobeefull
+	name = "Bug abdomen, bee full, dual-colorable"
+	desc = ""
+	icon_state = "buggo_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobeefull_markings"
+
+/datum/sprite_accessory/tail/buggounder
+	name = "Bug abdomen, underside, dual-colorable"
+	desc = ""
+	icon_state = "buggo_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggounder_markings"
+
+/datum/sprite_accessory/tail/buggofirefly
+	name = "Bug abdomen, firefly, dual-colorable"
+	desc = ""
+	icon_state = "buggo_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofirefly_markings"
+
+/datum/sprite_accessory/tail/buggofat
+	name = "Fat bug abdomen, colorable"
+	desc = ""
+	icon_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/tail/buggofatbee
+	name = "Fat bug abdomen, bee top, dual-colorable"
+	desc = ""
+	icon_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatbee_markings"
+
+/datum/sprite_accessory/tail/buggofatbeefull
+	name = "Fat bug abdomen, bee full, dual-colorable"
+	desc = ""
+	icon_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatbeefull_markings"
+
+/datum/sprite_accessory/tail/buggofatunder
+	name = "Fat bug abdomen, underside, dual-colorable"
+	desc = ""
+	icon_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatunder_markings"
+
+/datum/sprite_accessory/tail/buggofatfirefly
+	name = "Fat bug abdomen, firefly, dual-colorable"
+	desc = ""
+	icon_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatfirefly_markings"
+
+/datum/sprite_accessory/tail/buggowag
+	name = "Bug abdomen, colorable, vwag change"
+	desc = ""
+	icon_state = "buggo_s"
+	ani_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/tail/buggobeewag
+	name = "Bug abdomen, bee top, dual color, vwag"
+	desc = ""
+	icon_state = "buggo_s"
+	ani_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobee_markings"
+	extra_overlay_w = "buggofatbee_markings"
+
+/datum/sprite_accessory/tail/buggobeefullwag
+	name = "Bug abdomen, bee full, dual color, vwag"
+	desc = ""
+	icon_state = "buggo_s"
+	ani_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobeefull_markings"
+	extra_overlay_w = "buggofatbeefull_markings"
+
+/datum/sprite_accessory/tail/buggounderwag
+	name = "Bug abdomen, underside, dual color, vwag"
+	desc = ""
+	icon_state = "buggo_s"
+	ani_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggounder_markings"
+	extra_overlay_w = "buggofatunder_markings"
+
+/datum/sprite_accessory/tail/buggofireflywag
+	name = "Bug abdomen, firefly, dual color, vwag"
+	desc = ""
+	icon_state = "buggo_s"
+	ani_state = "buggofat_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofirefly_markings"
+	extra_overlay_w = "buggofatfirefly_markings"
+
+//Vass buggo variants!
+
+/datum/sprite_accessory/tail/buggovass
+	name = "Bug abdomen, vass, colorable"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/tail/buggovassbee
+	name = "Bug abdomen, bee top, dc, vass"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobee_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassbeefull
+	name = "Bug abdomen, bee full, dc, vass"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobeefull_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassunder
+	name = "Bug abdomen, underside, dc, vass"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggounder_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassfirefly
+	name = "Bug abdomen, firefly, dc, vass"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofirefly_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassfat
+	name = "Fat bug abdomen, vass, colorable"
+	desc = ""
+	icon_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/tail/buggovassfatbee
+	name = "Fat bug abdomen, bee top, dc, vass"
+	desc = ""
+	icon_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatbee_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassfatbeefull
+	name = "Fat bug abdomen, bee full, dc, vass"
+	desc = ""
+	icon_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatbeefull_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassfatunder
+	name = "Fat bug abdomen, underside, dc, vass"
+	desc = ""
+	icon_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatunder_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassfatfirefly
+	name = "Fat bug abdomen, firefly, dc, vass"
+	desc = ""
+	icon_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofatfirefly_vass_markings"
+
+/datum/sprite_accessory/tail/buggovasswag
+	name = "Bug abdomen, vass, colorable, vwag change"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	ani_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+
+/datum/sprite_accessory/tail/buggovassbeewag
+	name = "Bug abdomen, bee top, dc, vass, vwag"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	ani_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobee_vass_markings"
+	extra_overlay_w = "buggofatbee_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassbeefullwag
+	name = "Bug abdomen, bee full, dc, vass, vwag"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	ani_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggobeefull_vass_markings"
+	extra_overlay_w = "buggofatbeefull_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassunderwag
+	name = "Bug abdomen, underside, dc, vass, vwag"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	ani_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggounder_vass_markings"
+	extra_overlay_w = "buggofatunder_vass_markings"
+
+/datum/sprite_accessory/tail/buggovassfireflywag
+	name = "Bug abdomen, firefly, dc, vass, vwag"
+	desc = ""
+	icon_state = "buggo_vass_s"
+	ani_state = "buggofat_vass_s"
+	do_colouration = 1
+	color_blend_mode = ICON_MULTIPLY
+	extra_overlay = "buggofirefly_vass_markings"
+	extra_overlay_w = "buggofatfirefly_vass_markings"

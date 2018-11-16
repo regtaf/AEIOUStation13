@@ -15,7 +15,7 @@
 
 /obj/item/weapon/gun/projectile/shotgun/pump/rifle/practice // For target practice
 	desc = "A bolt-action rifle with a lightweight synthetic wood stock, designed for competitive shooting. Comes shipped with practice rounds pre-loaded into the gun. Popular among professional marksmen. Uses 7.62mm rounds."
-	ammo_type = /obj/item/ammo_casing/a762p
+	ammo_type = /obj/item/ammo_casing/a762/practice
 
 /obj/item/weapon/gun/projectile/shotgun/pump/rifle/ceremonial
 	name = "ceremonial bolt-action rifle"
@@ -47,11 +47,11 @@
 	else
 		..()
 
-
 //Lever actions are the same thing, but bigger.
 /obj/item/weapon/gun/projectile/shotgun/pump/rifle/lever
 	name = "lever-action rifle"
 	desc = "A reproduction of an almost ancient weapon design from the 19th century. This one uses a lever-action to move new rounds into the chamber. Uses 7.62mm rounds."
+	icon = 'icons/obj/gun.dmi'
 	item_state = "leveraction"
 	icon_state = "leveraction"
 	fire_sound = 'sound/weapons/rifleshot.ogg'
@@ -61,3 +61,10 @@
 	ammo_type = /obj/item/ammo_casing/a762
 	load_method = SINGLE_CASING|SPEEDLOADER
 	action_sound = 'sound/weapons/riflebolt.ogg'
+
+/obj/item/weapon/gun/projectile/shotgun/pump/rifle/lever/vintage
+	name = "vintage repeater"
+	desc = "An iconic manually operated lever action rifle, offering adequate stopping power due to it's still powerful cartridge while at the same time having a rather respectable firing rate due to it's mechanism. It is very probable this is a replica instead of a museum piece, but rifles of this pattern still see usage as colonist guns in some far off regions. Uses 7,62mm ammo."
+	item_state = "levercarabine"
+	icon_state = "levercarabine"
+	animated_pump = 1

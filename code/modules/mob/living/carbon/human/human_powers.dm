@@ -1,6 +1,38 @@
 // These should all be procs, you can add them to humans/subspecies by
 // species.dm's inherent_verbs ~ Z
 
+/mob/living/carbon/human/proc/tie_hair()
+	set name = "Tie Hair"
+	set desc = "Style your hair."
+	set category = "IC"
+
+	if(incapacitated())
+		to_chat(src, "<span class='warning'>You can't mess with your hair right now!</span>")
+		return
+
+	if(h_style)
+		var/datum/sprite_accessory/hair/hair_style = hair_styles_list[h_style]
+		var/selected_string
+		if(!(hair_style.flags & HAIR_TIEABLE))
+			to_chat(src, "<span class ='warning'>Your hair isn't long enough to tie.</span>")
+			return
+		else
+			var/list/datum/sprite_accessory/hair/valid_hairstyles = list()
+			for(var/hair_string in hair_styles_list)
+				var/list/datum/sprite_accessory/hair/test = hair_styles_list[hair_string]
+				if(test.flags & HAIR_TIEABLE)
+					valid_hairstyles.Add(hair_string)
+			selected_string = input("Select a new hairstyle", "Your hairstyle", hair_style) as null|anything in valid_hairstyles
+		if(incapacitated())
+			to_chat(src, "<span class='warning'>You can't mess with your hair right now!</span>")
+			return
+		else if(selected_string && h_style != selected_string)
+			h_style = selected_string
+			regenerate_icons()
+			visible_message("<span class='notice'>[src] pauses a moment to style their hair.</span>")
+		else
+			to_chat(src, "<span class ='notice'>You're already using that style.</span>")
+
 /mob/living/carbon/human/proc/tackle()
 	set category = "Abilities"
 	set name = "Tackle"
@@ -167,7 +199,7 @@
 
 	var/toxDam = getToxLoss()
 	if(toxDam)
-		output += "System Instability: <span class='warning'>[toxDam > 25 ? "Severe" : "Moderate"]</span>. Seek charging station for cleanup.\n"
+		output += "System Instability: <span class='warning'>[toxDam > 25 ? "Severe" : "Moderate"]</span>\n"
 	else
 		output += "System Instability: <span style='color:green;'>OK</span>\n"
 
@@ -273,7 +305,7 @@
 				var/obj/item/organ/O = new limb_path(src)
 				organ_data["descriptor"] = O.name
 				to_chat(src, "<span class='notice'>You feel a slithering sensation as your [O.name] reform.</span>")
-		update_icons_body()
+		update_icons_all()
 		active_regen = FALSE
 	else
 		to_chat(src, "<span class='critical'>Your regeneration is interrupted!</span>")
